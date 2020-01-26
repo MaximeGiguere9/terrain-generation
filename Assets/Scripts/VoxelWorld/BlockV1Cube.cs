@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace WorldObjects
+namespace VoxelWorld
 {
 	/// <summary>
 	/// Block script v1

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace WorldObjects
+namespace VoxelWorld
 {
 	/// <summary>
 	/// Block script v2.
