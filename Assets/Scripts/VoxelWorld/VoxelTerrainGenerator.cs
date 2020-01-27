@@ -1,11 +1,11 @@
-﻿using Noise;
+﻿using System.Collections;
+using Noise;
 using UnityEngine;
 
 namespace VoxelWorld
 {
 	public class VoxelTerrainGenerator : MonoBehaviour
 	{
-		[SerializeField] private GameObject blockPrefab;
 		[SerializeField] private Vector3Int size;
 		[SerializeField] private int seed;
 		[SerializeField] private float scale = 0.09f;
@@ -82,9 +82,20 @@ namespace VoxelWorld
 				int z = pos.z;
 
 				this.noiseMap[x, y, z] = Mathf.InverseLerp(minValue, maxValue, this.noiseMap[x, y, z]);
-				if (this.noiseMap[x, y, z] < this.density.Evaluate((float)y / size.y))
-					Instantiate(this.blockPrefab, new Vector3(x, y, z), Quaternion.identity, transform);
+				if (this.noiseMap[x, y, z] > this.density.Evaluate((float) y / size.y)) continue;
+
+				Block block = new Block();
+				block.Position = new Vector3Int(x,y,z);
+				ChunkManager.AddBlock(block);
 			}
+
+			StartCoroutine(Redraw());
+		}
+
+		private IEnumerator Redraw()
+		{
+			yield return new WaitForEndOfFrame();
+			ChunkManager.RedrawAll();
 		}
 	}
 }
