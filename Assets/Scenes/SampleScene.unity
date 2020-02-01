@@ -159,7 +159,7 @@ Light:
     m_CustomResolution: -1
     m_Strength: 1
     m_Bias: 0.05
-    m_NormalBias: 0.4
+    m_NormalBias: 0
     m_NearPlane: 0.2
     m_CullingMatrixOverride:
       e00: 1
@@ -324,7 +324,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b22b1257465cddb43b25a6d0f1ca0cbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  size: {x: 128, y: 128, z: 128}
+  size: {x: 64, y: 32, z: 64}
   seed: 23123
   scale: 0.01
   offset: {x: 10, y: 124, z: 234}

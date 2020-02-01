@@ -53,6 +53,20 @@ namespace VoxelWorld
 					byte[] tris = Block.TrianglesTable[i];
 					foreach (byte vertexId in tris)
 					{
+						//weld vertices (leads to smooth shading)
+						/*
+						Vector3 v = block.Position + Block.Vertices[vertexId];
+						int vi = vertices.IndexOf(v);
+						if (vi == -1)
+						{
+							triangles.Add(vertices.Count);
+							vertices.Add(v);
+						}
+						else
+						{
+							triangles.Add(vi);
+						}*/
+
 						triangles.Add(vertices.Count);
 						vertices.Add(block.Position + Block.Vertices[vertexId]);
 					}
@@ -61,6 +75,8 @@ namespace VoxelWorld
 
 			mesh.vertices = vertices.ToArray();
 			mesh.triangles = triangles.ToArray();
+			mesh.RecalculateNormals();
+			mesh.RecalculateTangents();
 
 			GetComponent<MeshFilter>().mesh = mesh;
 		}
