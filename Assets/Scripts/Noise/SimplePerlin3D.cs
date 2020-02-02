@@ -2,11 +2,9 @@
 
 namespace Noise
 {
-	public class SimplePerlin3D : INoiseSampler
+	public class SimplePerlin3D : NoiseSampler
 	{
-		public float Sample(Vector3 position) => Sample(position.x, position.y, position.z);
-
-		public float Sample(float x, float y, float z)
+		public override float Sample(float x, float y, float z)
 		{
 			float AB = Mathf.PerlinNoise(x, y);
 			float BC = Mathf.PerlinNoise(y, z);

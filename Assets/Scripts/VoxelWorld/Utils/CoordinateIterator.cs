@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Noise
+namespace VoxelWorld.Utils
 {
 	/// <summary>
 	/// 1-loop shortcut to 3-loop x,y,z iteration

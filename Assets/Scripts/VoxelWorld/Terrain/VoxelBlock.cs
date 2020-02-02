@@ -1,17 +1,10 @@
 ﻿using UnityEngine;
 
-namespace VoxelWorld
+namespace VoxelWorld.Terrain
 {
-	public class Block
+	public class VoxelBlock
 	{
-		public enum BlockTypes
-		{
-			Stone,
-			Dirt,
-			Grass
-		}
-
-		public static byte[] Bits = { 1, 2, 4, 8, 16, 32, 64, 128 };
+		private static readonly byte[] Bits = { 1, 2, 4, 8, 16, 32, 64, 128 };
 
 		public static readonly Vector3Int[] Vertices =
 		{
@@ -36,22 +29,9 @@ namespace VoxelWorld
 		};
 
 		/// <summary>
-		/// The four vertices forming a face, in the same orders as Vertices and Faces
-		/// </summary>
-		private static readonly byte[][] VertexVisibilityLookup =
-		{
-			new byte[] {1, 2, 5, 6},
-			new byte[] {0, 3, 4, 7},
-			new byte[] {4, 5, 6, 7},
-			new byte[] {0, 1, 2, 3},
-			new byte[] {2, 3, 6, 7},
-			new byte[] {0, 1, 4, 5}
-		};
-
-		/// <summary>
 		/// The vertices to use to form the two triangles of a face, in the same order as Faces
 		/// </summary>
-		public static readonly byte[][] TrianglesTable =
+		public static readonly byte[][] Triangles =
 		{
 			new byte[] {6, 1, 5, 6, 2, 1},
 			new byte[] {0, 3, 7, 4, 0, 7},
@@ -67,9 +47,8 @@ namespace VoxelWorld
 		/// Bit field of visible faces, in the same order as Faces
 		/// </summary>
 		public byte VisibleFaces { get; private set; }
-		public bool IsVisible => this.VisibleFaces != 0;
 
-		public BlockTypes BlockType = BlockTypes.Stone;
+		public VoxelBlockTypes BlockType = VoxelBlockTypes.Stone;
 
 		public void UpdateVisibility()
 		{
@@ -77,12 +56,14 @@ namespace VoxelWorld
 
 			for(int i = 0; i < Faces.Length; i++)
 			{
-				bool visible = ChunkManager.GetBlockAt(this.Position + Faces[i]) == null;
+				bool visible = VoxelTerrain.ActiveTerrain.GetBlockAt(this.Position + Faces[i]) == null;
 
 				if (!visible) continue;
 
 				this.VisibleFaces |= Bits[i];
 			}
 		}
+
+		public bool IsFaceVisible(int faceIndex) => (this.VisibleFaces | Bits[faceIndex]) == this.VisibleFaces;
 	}
 }

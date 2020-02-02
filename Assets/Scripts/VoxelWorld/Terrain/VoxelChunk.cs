@@ -1,24 +1,31 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Noise;
 using UnityEngine;
+using VoxelWorld.Utils;
 
-namespace VoxelWorld
+namespace VoxelWorld.Terrain
 {
 	public class VoxelChunk : MonoBehaviour
 	{
-		public const int ChunkSize = 16;
+		private static int ChunkSize => VoxelWorldSettings.Instance.ChunkSize;
 
-		private readonly Block[,,] blocks = new Block[ChunkSize, ChunkSize, ChunkSize];
+		private VoxelBlock[,,] blocks;
 
 		public Vector3Int Position { get; set; }
 
-		public void AddBlock(Block block)
+		private void Awake()
+		{
+			this.blocks = new VoxelBlock[ChunkSize, ChunkSize, ChunkSize];
+		}
+
+		public void AddBlock(VoxelBlock block)
 		{
 			Vector3Int relPos = block.Position - this.Position * ChunkSize;
 			this.blocks[relPos.x, relPos.y, relPos.z] = block;
 		}
 
-		public Block GetBlockAt(Vector3Int position)
+		public VoxelBlock GetBlockAt(Vector3Int position)
 		{
 			Vector3Int relPos = position - this.Position * ChunkSize;
 			return this.blocks[relPos.x, relPos.y, relPos.z];
@@ -41,16 +48,16 @@ namespace VoxelWorld
 
 			foreach (Vector3Int pos in itr)
 			{
-				Block block = this.blocks[pos.x, pos.y, pos.z];
+				VoxelBlock block = this.blocks[pos.x, pos.y, pos.z];
 				if (block == null) continue;
 
 				block.UpdateVisibility();
 
-				for (int i = 0; i < Block.Faces.Length; i++)
+				for (int i = 0; i < VoxelBlock.Faces.Length; i++)
 				{
-					if ((block.VisibleFaces | Block.Bits[i]) != block.VisibleFaces) continue;
+					if (!block.IsFaceVisible(i)) continue;
 
-					byte[] tris = Block.TrianglesTable[i];
+					byte[] tris = VoxelBlock.Triangles[i];
 					foreach (byte vertexId in tris)
 					{
 						//weld vertices (leads to smooth shading)
@@ -68,7 +75,7 @@ namespace VoxelWorld
 						}*/
 
 						triangles.Add(vertices.Count);
-						vertices.Add(block.Position + Block.Vertices[vertexId]);
+						vertices.Add(block.Position + VoxelBlock.Vertices[vertexId]);
 					}
 				}
 			}

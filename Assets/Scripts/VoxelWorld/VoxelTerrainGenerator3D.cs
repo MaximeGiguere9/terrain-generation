@@ -1,14 +1,16 @@
 ﻿using System.Collections;
 using Noise;
 using UnityEngine;
+using VoxelWorld.Terrain;
+using VoxelWorld.Utils;
 
 namespace VoxelWorld
 {
-	public class VoxelTerrainGenerator : MonoBehaviour
+	public class VoxelTerrainGenerator3D : MonoBehaviour
 	{
 		[SerializeField] private Vector3Int size;
 		[SerializeField] private int seed;
-		[SerializeField] private float scale = 0.09f;
+		[SerializeField] private float scale = 0.01f;
 
 		[Tooltip("Noise sample coordinates get offset by this amount")]
 		[SerializeField] private Vector3 offset;
@@ -29,7 +31,7 @@ namespace VoxelWorld
 		         "must be above the specified threshold to spawn a block.")]
 		[SerializeField] private AnimationCurve density;
 
-		private readonly INoiseSampler noiseSampler = new SimplePerlin3D();
+		private readonly NoiseSampler noiseSampler = new SimplePerlin3D();
 
 		private float[,,] noiseMap;
 
@@ -84,9 +86,9 @@ namespace VoxelWorld
 				this.noiseMap[x, y, z] = Mathf.InverseLerp(minValue, maxValue, this.noiseMap[x, y, z]);
 				if (this.noiseMap[x, y, z] > this.density.Evaluate((float) y / size.y)) continue;
 
-				Block block = new Block();
+				VoxelBlock block = new VoxelBlock();
 				block.Position = new Vector3Int(x,y,z);
-				ChunkManager.AddBlock(block);
+				VoxelTerrain.ActiveTerrain.AddBlock(block);
 			}
 
 			StartCoroutine(Redraw());
@@ -95,7 +97,7 @@ namespace VoxelWorld
 		private IEnumerator Redraw()
 		{
 			yield return new WaitForEndOfFrame();
-			ChunkManager.RedrawAll();
+			VoxelTerrain.ActiveTerrain.RedrawAll();
 		}
 	}
 }

@@ -3,11 +3,9 @@ using UnityEngine;
 
 namespace Noise
 {
-	public class PerlinNoise : INoiseSampler
+	public class PerlinNoise : NoiseSampler
 	{
-		public float Sample(Vector3 position) => Sample(position.x, position.y, position.z);
-
-		public float Sample(float x, float y, float z) => Noise(x, y, z);
+		public override float Sample(float x, float y, float z) => Noise(x, y, z);
 
 		private static float Noise(float x, float y, float z)
 		{
