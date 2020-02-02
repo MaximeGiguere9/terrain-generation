@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace VoxelWorld
 {
-	public class Chunk : MonoBehaviour
+	public class VoxelChunk : MonoBehaviour
 	{
 		public const int ChunkSize = 16;
 
@@ -79,6 +79,8 @@ namespace VoxelWorld
 			mesh.RecalculateTangents();
 
 			GetComponent<MeshFilter>().mesh = mesh;
+
+			GetComponent<MeshCollider>().sharedMesh = GetComponent<MeshFilter>().sharedMesh;
 		}
 	}
 }
