@@ -31,10 +31,12 @@ namespace VoxelWorld.Terrain
 			return this.blocks[relPos.x, relPos.y, relPos.z];
 		}
 
-		public void RemoveBlockAt(Vector3Int position)
+		public VoxelBlock RemoveBlockAt(Vector3Int position)
 		{
 			Vector3Int relPos = position - this.Position * ChunkSize;
+			VoxelBlock block = this.blocks[relPos.x, relPos.y, relPos.z];
 			this.blocks[relPos.x, relPos.y, relPos.z] = null;
+			return block;
 		}
 
 		public void Redraw()

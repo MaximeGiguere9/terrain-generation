@@ -11,6 +11,17 @@ namespace VoxelWorld.Terrain
 		private static GameObject ChunkPrefab => VoxelWorldSettings.Instance.ChunkPrefab;
 		private static int ChunkSize => VoxelWorldSettings.Instance.ChunkSize;
 
+		public static readonly Vector3Int[] Neighbors =
+		{
+			Vector3Int.zero,
+			Vector3Int.right,
+			Vector3Int.left,
+			Vector3Int.up,
+			Vector3Int.down,
+			new Vector3Int(0, 0, 1),
+			new Vector3Int(0, 0, -1)
+		};
+
 		private readonly Dictionary<Vector3Int, VoxelChunk> ChunkMap = new Dictionary<Vector3Int, VoxelChunk>();
 
 		private void Awake()
@@ -34,6 +45,22 @@ namespace VoxelWorld.Terrain
 
 			VoxelChunk chunk = GetChunkAt(chunkPosition);
 			return chunk == null ? null : chunk.GetBlockAt(position);
+		}
+
+		public VoxelBlock RemoveBlockAt(Vector3Int position)
+		{
+			Vector3Int chunkPosition = GetContainingChunkPosition(position);
+
+			VoxelChunk chunk = GetChunkAt(chunkPosition);
+			if (chunk == null) return null;
+
+			VoxelBlock removedBlock = chunk.RemoveBlockAt(position);
+			if (removedBlock == null) return null;
+
+			foreach (Vector3Int offset in Neighbors)
+				GetChunkAt(chunkPosition + offset)?.Redraw();
+
+			return removedBlock;
 		}
 
 		public VoxelChunk CreateChunk(Vector3Int position)

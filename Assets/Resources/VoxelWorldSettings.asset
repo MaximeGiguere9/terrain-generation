@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d06d9b841a6d4d178936982e6cc8b40d, type: 3}
   m_Name: VoxelWorldSettings
   m_EditorClassIdentifier: 
-  ChunkPrefab: {fileID: 0}
-  ChunkSize: 0
+  ChunkPrefab: {fileID: 4010884303636399895, guid: 93299f9cdc1866048a26e3fc39956ce0,
+    type: 3}
+  ChunkSize: 16
