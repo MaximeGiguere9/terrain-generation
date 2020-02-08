@@ -29,33 +29,33 @@ namespace VoxelWorld.Terrain
 			SetActiveTerrain(this);
 		}
 
-		public void AddBlock(VoxelBlock block)
+		public void SetBlockAt(Vector3Int position, byte blockId)
 		{
-			Vector3Int chunkPosition = GetContainingChunkPosition(block.Position);
+			Vector3Int chunkPosition = GetContainingChunkPosition(position);
 
 			VoxelChunk chunk = GetChunkAt(chunkPosition);
 
 			if (chunk == null) chunk = CreateChunk(chunkPosition);
-			chunk.AddBlock(block);
+			chunk.SetBlockAt(position, blockId);
 		}
 
-		public VoxelBlock GetBlockAt(Vector3Int position)
+		public byte GetBlockAt(Vector3Int position)
 		{
 			Vector3Int chunkPosition = GetContainingChunkPosition(position);
 
 			VoxelChunk chunk = GetChunkAt(chunkPosition);
-			return chunk == null ? null : chunk.GetBlockAt(position);
+			return chunk == null ? (byte) 0 : chunk.GetBlockAt(position);
 		}
 
-		public VoxelBlock RemoveBlockAt(Vector3Int position)
+		public byte RemoveBlockAt(Vector3Int position)
 		{
 			Vector3Int chunkPosition = GetContainingChunkPosition(position);
 
 			VoxelChunk chunk = GetChunkAt(chunkPosition);
-			if (chunk == null) return null;
+			if (chunk == null) return 0;
 
-			VoxelBlock removedBlock = chunk.RemoveBlockAt(position);
-			if (removedBlock == null) return null;
+			byte removedBlock = chunk.RemoveBlockAt(position);
+			if (removedBlock == 0) return 0;
 
 			foreach (Vector3Int offset in Neighbors)
 				GetChunkAt(chunkPosition + offset)?.Redraw();

@@ -86,9 +86,7 @@ namespace VoxelWorld
 				this.noiseMap[x, y, z] = Mathf.InverseLerp(minValue, maxValue, this.noiseMap[x, y, z]);
 				if (this.noiseMap[x, y, z] > this.density.Evaluate((float) y / size.y)) continue;
 
-				VoxelBlock block = new VoxelBlock();
-				block.Position = new Vector3Int(x,y,z);
-				VoxelTerrain.ActiveTerrain.AddBlock(block);
+				VoxelTerrain.ActiveTerrain.SetBlockAt(new Vector3Int(x, y, z), (byte) 1);
 			}
 
 			StartCoroutine(Redraw());

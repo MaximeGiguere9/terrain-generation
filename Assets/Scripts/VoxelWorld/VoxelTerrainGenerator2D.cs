@@ -89,9 +89,15 @@ namespace VoxelWorld
 
 				for (int y = 0; y < height; y++)
 				{
-					VoxelBlock block = new VoxelBlock();
-					block.Position = new Vector3Int(x, y, z);
-					VoxelTerrain.ActiveTerrain.AddBlock(block);
+					byte blockId = 0;
+
+					if (y == 0) blockId = 2;
+					else if (y == height - 1) blockId = 5;
+					else if (y == height - 2) blockId = 4;
+					else if (y > height - 5) blockId = 3;
+					else blockId = 1;
+
+					VoxelTerrain.ActiveTerrain.SetBlockAt(new Vector3Int(x,y,z), blockId);
 				}
 
 			}

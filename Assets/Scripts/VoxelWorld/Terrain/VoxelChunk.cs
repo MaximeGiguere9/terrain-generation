@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Noise;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using VoxelWorld.Utils;
 
@@ -10,34 +8,46 @@ namespace VoxelWorld.Terrain
 	{
 		private static int ChunkSize => VoxelWorldSettings.Instance.ChunkSize;
 
-		private VoxelBlock[,,] blocks;
+		private byte[,,] blocks;
 
-		public Vector3Int Position { get; set; }
+		private Vector3Int position;
+		public Vector3Int Position
+		{
+			get => this.position;
+			set
+			{
+				if (this.position == value) return;
+				this.position = value;
+				transform.position = value * ChunkSize;
+			}
+		}
 
 		private void Awake()
 		{
-			this.blocks = new VoxelBlock[ChunkSize, ChunkSize, ChunkSize];
+			this.blocks = new byte[ChunkSize, ChunkSize, ChunkSize];
 		}
 
-		public void AddBlock(VoxelBlock block)
+		public void SetBlockAt(Vector3Int position, byte blockId)
 		{
-			Vector3Int relPos = block.Position - this.Position * ChunkSize;
-			this.blocks[relPos.x, relPos.y, relPos.z] = block;
+			Vector3Int relPos = position - this.Position * ChunkSize;
+			this.blocks[relPos.x, relPos.y, relPos.z] = blockId;
 		}
 
-		public VoxelBlock GetBlockAt(Vector3Int position)
+		public byte GetBlockAt(Vector3Int position)
 		{
 			Vector3Int relPos = position - this.Position * ChunkSize;
 			return this.blocks[relPos.x, relPos.y, relPos.z];
 		}
 
-		public VoxelBlock RemoveBlockAt(Vector3Int position)
+		public byte RemoveBlockAt(Vector3Int position)
 		{
 			Vector3Int relPos = position - this.Position * ChunkSize;
-			VoxelBlock block = this.blocks[relPos.x, relPos.y, relPos.z];
-			this.blocks[relPos.x, relPos.y, relPos.z] = null;
+			byte block = this.blocks[relPos.x, relPos.y, relPos.z];
+			this.blocks[relPos.x, relPos.y, relPos.z] = 0;
 			return block;
 		}
+
+		private Vector3Int GetWorldPosition(Vector3Int relPos) => relPos + this.Position * ChunkSize;
 
 		public void Redraw()
 		{
@@ -45,21 +55,28 @@ namespace VoxelWorld.Terrain
 
 			List<Vector3> vertices = new List<Vector3>();
 			List<int> triangles = new List<int>();
+			List<Vector2> uvs = new List<Vector2>();
 
 			CoordinateIterator itr = new CoordinateIterator(Vector3Int.one * ChunkSize, Vector3Int.zero);
 
 			foreach (Vector3Int pos in itr)
 			{
-				VoxelBlock block = this.blocks[pos.x, pos.y, pos.z];
-				if (block == null) continue;
-
-				block.UpdateVisibility();
+				byte block = this.blocks[pos.x, pos.y, pos.z];
+				if (block == 0) continue;
 
 				for (int i = 0; i < VoxelBlock.Faces.Length; i++)
 				{
-					if (!block.IsFaceVisible(i)) continue;
+					if(!VoxelBlock.IsFaceVisible(GetWorldPosition(pos), i)) continue;
 
-					byte[] tris = VoxelBlock.Triangles[i];
+					vertices.AddRange(VoxelBlock.GetFaceVertices(pos, i));
+					uvs.AddRange(VoxelBlock.GetFaceUVs(block, i));
+
+					foreach (byte id in VoxelBlock.FaceTriangles)
+					{
+						triangles.Add(vertices.Count - 1 - id);
+					}
+
+					/*byte[] tris = BlockData.Triangles[i];
 					foreach (byte vertexId in tris)
 					{
 						//weld vertices (leads to smooth shading)
@@ -74,16 +91,19 @@ namespace VoxelWorld.Terrain
 						else
 						{
 							triangles.Add(vi);
-						}*/
+						}/
 
 						triangles.Add(vertices.Count);
-						vertices.Add(block.Position + VoxelBlock.Vertices[vertexId]);
+						vertices.Add(pos + BlockData.Vertices[vertexId]);
 					}
+
+					uvs.AddRange(BlockData.GetFaceUVs(block, i));*/
 				}
 			}
 
 			mesh.vertices = vertices.ToArray();
 			mesh.triangles = triangles.ToArray();
+			mesh.uv = uvs.ToArray();
 			mesh.RecalculateNormals();
 			mesh.RecalculateTangents();
 

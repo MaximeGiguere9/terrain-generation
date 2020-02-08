@@ -1,11 +1,13 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace VoxelWorld.Terrain
 {
 	public class VoxelBlock
 	{
-		private static readonly byte[] Bits = { 1, 2, 4, 8, 16, 32, 64, 128 };
-
+		/// <summary>
+		/// The 8 corners of the block in the right order
+		/// </summary>
 		public static readonly Vector3Int[] Vertices =
 		{
 			new Vector3Int(0, 0, 0),
@@ -18,6 +20,9 @@ namespace VoxelWorld.Terrain
 			new Vector3Int(0, 1, 1),
 		};
 
+		/// <summary>
+		/// The 6 face normals of the block
+		/// </summary>
 		public static readonly Vector3Int[] Faces =
 		{
 			Vector3Int.right,
@@ -29,41 +34,102 @@ namespace VoxelWorld.Terrain
 		};
 
 		/// <summary>
-		/// The vertices to use to form the two triangles of a face, in the same order as Faces
+		/// The 4 vertices (corners) forming a face of a block.
+		/// The first dimension corresponds to the faces, and the second their vertices.
+		/// Face index order matches <see cref="Faces"/>.
+		/// Vertex index order matches <see cref="Vertices"/>.
 		/// </summary>
-		public static readonly byte[][] Triangles =
+		public static readonly byte[][] FaceVertices =
 		{
-			new byte[] {6, 1, 5, 6, 2, 1},
-			new byte[] {0, 3, 7, 4, 0, 7},
-			new byte[] {6, 4, 7, 6, 5, 4},
-			new byte[] {0, 1, 2, 3, 0, 2},
-			new byte[] {7, 2, 6, 7, 3, 2},
-			new byte[] {5, 0, 4, 5, 1, 0}
+			new byte[] {1, 2, 6, 5},
+			new byte[] {3, 0, 4, 7},
+			new byte[] {4, 5, 6, 7},
+			new byte[] {3, 2, 1, 0},
+			new byte[] {2, 3, 7, 6},
+			new byte[] {0, 1, 5, 4}
 		};
 
-		public Vector3Int Position { get; set; }
+		/// <summary>
+		/// Order of vertices used to make the two triangles of a face
+		/// </summary>
+		public static readonly byte[] FaceTriangles = {0, 1, 2, 0, 2, 3};
 
 		/// <summary>
-		/// Bit field of visible faces, in the same order as Faces
+		/// Shorthand for obtaining vertices of a face in world position
 		/// </summary>
-		public byte VisibleFaces { get; private set; }
-
-		public VoxelBlockTypes BlockType = VoxelBlockTypes.Stone;
-
-		public void UpdateVisibility()
+		/// <param name="position">world position of the block</param>
+		/// <param name="faceId">face index of the block (must match <see cref="Faces"/>)</param>
+		/// <returns></returns>
+		public static Vector3[] GetFaceVertices(Vector3 position, int faceId)
 		{
-			this.VisibleFaces = 0;
-
-			for(int i = 0; i < Faces.Length; i++)
+			return new[]
 			{
-				bool visible = VoxelTerrain.ActiveTerrain.GetBlockAt(this.Position + Faces[i]) == null;
-
-				if (!visible) continue;
-
-				this.VisibleFaces |= Bits[i];
-			}
+				position + Vertices[FaceVertices[faceId][0]],
+				position + Vertices[FaceVertices[faceId][1]],
+				position + Vertices[FaceVertices[faceId][2]],
+				position + Vertices[FaceVertices[faceId][3]]
+			};
+		}
+		
+		public static Vector2[] GetFaceUVs(byte blockId, int faceIndex)
+		{
+			int ti = blocks[blockId].textureIds[faceIndex];
+			int x = ti % 16;
+			int y = ti / 16;
+			return new[]
+			{
+				new Vector2(x / 16f, y / 16f),
+				new Vector2((x + 1) / 16f, y / 16f),
+				new Vector2((x + 1) / 16f, (y + 1) / 16f),
+				new Vector2(x / 16f, (y + 1) / 16f)
+			};
 		}
 
-		public bool IsFaceVisible(int faceIndex) => (this.VisibleFaces | Bits[faceIndex]) == this.VisibleFaces;
+		public static bool IsOpaque(byte blockId)
+		{
+			return blocks.TryGetValue(blockId, out BlockTypeConfig value) && value.isOpaque;
+		}
+
+		public static bool IsFaceVisible(Vector3Int position, int faceIndex)
+		{
+			return !IsOpaque(VoxelTerrain.ActiveTerrain.GetBlockAt(position + Faces[faceIndex]));
+		}
+
+		private class BlockTypeConfig
+		{
+			public byte blockId;
+			public string name;
+			public int[] textureIds;
+			public bool isOpaque;
+		}
+
+		private static readonly Dictionary<byte, BlockTypeConfig> blocks = new Dictionary<byte, BlockTypeConfig>
+		{
+			{
+				1,
+				new BlockTypeConfig
+					{blockId = 1, name = "stone", textureIds = new[] {241, 241, 241, 241, 241, 241}, isOpaque = true}
+			},
+			{
+				2,
+				new BlockTypeConfig
+					{blockId = 2, name = "bedrock", textureIds = new[] {225, 225, 225, 225, 225, 225}, isOpaque = true}
+			},
+			{
+				3,
+				new BlockTypeConfig
+					{blockId = 3, name = "dirt", textureIds = new[] {242, 242, 242, 242, 242, 242}, isOpaque = true}
+			},
+			{
+				4,
+				new BlockTypeConfig
+					{blockId = 4, name = "grass", textureIds = new[] {243, 243, 240, 242, 243, 243}, isOpaque = true}
+			},
+			{
+				5,
+				new BlockTypeConfig
+					{blockId = 5, name = "leaves", textureIds = new[] {196, 196, 196, 196, 196, 196}, isOpaque = false}
+			}
+		};
 	}
 }
