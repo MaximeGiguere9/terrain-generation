@@ -6,7 +6,7 @@ namespace VoxelWorld.Actors
 	public class FirstPersonController : MonoBehaviour
 	{
 		[SerializeField] private Transform cameraTransform;
-		[SerializeField] private Transform avatarTransform;
+		[SerializeField] private CharacterController characterController;
 		[SerializeField] private float sensitivity = 100;
 		[SerializeField] private float maxPitch = 80;
 		[SerializeField] private float movementSpeed = 5;
@@ -45,10 +45,12 @@ namespace VoxelWorld.Actors
 			Vector3 movementInput = Quaternion.AngleAxis(this.Yaw, Vector3.up) *
 			                        new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
-			this.avatarTransform.localEulerAngles = new Vector3(0, this.Yaw, 0);
+			movementInput.y = Input.GetButton("Jump") ? 1 : Input.GetButton("Fire3") ? -1 : 0;
+
+			this.characterController.transform.localEulerAngles = new Vector3(0, this.Yaw, 0);
 			this.cameraTransform.localEulerAngles = new Vector3(-this.Pitch, 0, 0);
 
-			this.avatarTransform.position += movementInput * this.movementSpeed * Time.deltaTime;
+			this.characterController.Move(movementInput * this.movementSpeed * Time.deltaTime);
 		}
 
 		private void Target()

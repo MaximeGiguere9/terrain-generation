@@ -1155,7 +1155,6 @@ GameObject:
   - component: {fileID: 1484056205}
   - component: {fileID: 1484056203}
   - component: {fileID: 1484056202}
-  - component: {fileID: 1484056204}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1163,22 +1162,24 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!54 &1484056202
-Rigidbody:
+--- !u!143 &1484056202
+CharacterController:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1484056201}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
   serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 80
-  m_CollisionDetection: 0
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1484056203
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1192,25 +1193,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 963194228}
-  avatarTransform: {fileID: 1484056205}
+  characterController: {fileID: 1484056202}
   sensitivity: 100
   maxPitch: 80
-  movementSpeed: 5
+  movementSpeed: 10
   maxTargetRange: 3
---- !u!136 &1484056204
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1484056201}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.4
-  m_Height: 1.8
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &1484056205
 Transform:
   m_ObjectHideFlags: 0
