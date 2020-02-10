@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace VoxelWorld.Terrain
@@ -24,12 +25,45 @@ namespace VoxelWorld.Terrain
 
 		private readonly Dictionary<Vector3Int, VoxelChunk> ChunkMap = new Dictionary<Vector3Int, VoxelChunk>();
 
+		private readonly Queue<VoxelChunk> redrawQueue = new Queue<VoxelChunk>();
+
 		private void Awake()
 		{
 			SetActiveTerrain(this);
 		}
 
-		public void SetBlockAt(Vector3Int position, byte blockId)
+		public void Redraw(VoxelChunk chunk, bool immediate = false)
+		{
+			if (immediate)
+			{
+				chunk.Redraw();
+				return;
+			}
+
+			if (chunk == null || this.redrawQueue.Contains(chunk)) return;
+			this.redrawQueue.Enqueue(chunk);
+
+			if (this.redrawQueue.Count == 1)
+				StartCoroutine(RedrawChunksCoroutine());
+		}
+
+		public void RedrawAll(bool immediate = false)
+		{
+			foreach (VoxelChunk chunk in ChunkMap.Values)
+				Redraw(chunk, immediate);
+		}
+
+		private IEnumerator RedrawChunksCoroutine()
+		{
+			while (this.redrawQueue.Count > 0)
+			{
+				VoxelChunk chunk = this.redrawQueue.Dequeue();
+				chunk.Redraw();
+				yield return null;
+			}
+		}
+
+		public void SetBlockAt(Vector3Int position, byte blockId, bool redraw = false)
 		{
 			Vector3Int chunkPosition = GetContainingChunkPosition(position);
 
@@ -37,6 +71,11 @@ namespace VoxelWorld.Terrain
 
 			if (chunk == null) chunk = CreateChunk(chunkPosition);
 			chunk.SetBlockAt(position, blockId);
+
+			if (!redraw) return;
+
+			foreach (Vector3Int offset in Neighbors)
+				Redraw(GetChunkAt(chunkPosition + offset));
 		}
 
 		public byte GetBlockAt(Vector3Int position)
@@ -58,7 +97,7 @@ namespace VoxelWorld.Terrain
 			if (removedBlock == 0) return 0;
 
 			foreach (Vector3Int offset in Neighbors)
-				GetChunkAt(chunkPosition + offset)?.Redraw();
+				Redraw(GetChunkAt(chunkPosition + offset));
 
 			return removedBlock;
 		}
@@ -91,12 +130,8 @@ namespace VoxelWorld.Terrain
 			);
 		}
 
-		public void RedrawAll()
-		{
-			foreach (VoxelChunk chunk in ChunkMap.Values)
-			{
-				chunk.Redraw();
-			}
-		}
+		
+
+		
 	}
 }

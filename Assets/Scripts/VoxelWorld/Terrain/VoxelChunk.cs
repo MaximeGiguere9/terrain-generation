@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using VoxelWorld.Utils;
 
@@ -7,6 +8,9 @@ namespace VoxelWorld.Terrain
 	public class VoxelChunk : MonoBehaviour
 	{
 		private static int ChunkSize => VoxelWorldSettings.Instance.ChunkSize;
+
+		[SerializeField] private MeshFilter meshFilter;
+		[SerializeField] private MeshCollider meshCollider;
 
 		private byte[,,] blocks;
 
@@ -70,34 +74,7 @@ namespace VoxelWorld.Terrain
 
 					vertices.AddRange(VoxelBlock.GetFaceVertices(pos, i));
 					uvs.AddRange(VoxelBlock.GetFaceUVs(block, i));
-
-					foreach (byte id in VoxelBlock.FaceTriangles)
-					{
-						triangles.Add(vertices.Count - 1 - id);
-					}
-
-					/*byte[] tris = BlockData.Triangles[i];
-					foreach (byte vertexId in tris)
-					{
-						//weld vertices (leads to smooth shading)
-						/*
-						Vector3 v = block.Position + Block.Vertices[vertexId];
-						int vi = vertices.IndexOf(v);
-						if (vi == -1)
-						{
-							triangles.Add(vertices.Count);
-							vertices.Add(v);
-						}
-						else
-						{
-							triangles.Add(vi);
-						}/
-
-						triangles.Add(vertices.Count);
-						vertices.Add(pos + BlockData.Vertices[vertexId]);
-					}
-
-					uvs.AddRange(BlockData.GetFaceUVs(block, i));*/
+					triangles.AddRange(VoxelBlock.FaceTriangles.Select(id => vertices.Count - 1 - id));
 				}
 			}
 
@@ -107,9 +84,8 @@ namespace VoxelWorld.Terrain
 			mesh.RecalculateNormals();
 			mesh.RecalculateTangents();
 
-			GetComponent<MeshFilter>().mesh = mesh;
-
-			GetComponent<MeshCollider>().sharedMesh = GetComponent<MeshFilter>().sharedMesh;
+			this.meshFilter.mesh = mesh;
+			this.meshCollider.sharedMesh = this.meshFilter.sharedMesh;
 		}
 	}
 }
