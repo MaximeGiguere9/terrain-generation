@@ -129,6 +129,11 @@ namespace VoxelWorld.Terrain
 				5,
 				new BlockTypeConfig
 					{blockId = 5, name = "leaves", textureIds = new[] {196, 196, 196, 196, 196, 196}, isOpaque = false}
+			},
+			{
+				6,
+				new BlockTypeConfig
+					{blockId = 6, name = "brick", textureIds = new[] {247, 247, 247, 247, 247, 247}, isOpaque = true}
 			}
 		};
 	}

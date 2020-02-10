@@ -63,10 +63,19 @@ namespace VoxelWorld.Actors
 			if (!isHit) return;
 
 			Debug.DrawRay(hit.point, hit.normal, Color.blue);
-			Vector3Int blockPosition = Vector3Int.FloorToInt(hit.point - hit.normal/2);
+			
 
 			if (Input.GetButtonDown("Fire1"))
+			{
+				Vector3Int blockPosition = Vector3Int.FloorToInt(hit.point - hit.normal / 2);
 				VoxelTerrain.ActiveTerrain.RemoveBlockAt(blockPosition);
+			}
+			else if (Input.GetButtonDown("Fire2"))
+			{
+				Vector3Int blockPosition = Vector3Int.FloorToInt(hit.point + hit.normal / 2);
+				VoxelTerrain.ActiveTerrain.SetBlockAt(blockPosition, 6, true);
+			}
+				
 		}
 	}
 }
