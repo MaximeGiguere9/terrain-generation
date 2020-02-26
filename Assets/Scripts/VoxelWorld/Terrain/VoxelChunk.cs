@@ -10,7 +10,6 @@ namespace VoxelWorld.Terrain
 		private static int ChunkSize => VoxelWorldSettings.Instance.ChunkSize;
 
 		[SerializeField] private MeshFilter meshFilter;
-		[SerializeField] private MeshCollider meshCollider;
 
 		private byte[,,] blocks;
 
@@ -85,7 +84,6 @@ namespace VoxelWorld.Terrain
 			mesh.RecalculateTangents();
 
 			this.meshFilter.mesh = mesh;
-			this.meshCollider.sharedMesh = this.meshFilter.sharedMesh;
 		}
 	}
 }

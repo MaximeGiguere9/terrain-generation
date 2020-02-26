@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using VoxelWorld.Terrain;
+using VoxelWorld.Utils;
 
 namespace VoxelWorld.Actors
 {
@@ -55,25 +56,21 @@ namespace VoxelWorld.Actors
 
 		private void Target()
 		{
-			Ray ray = new Ray(this.cameraTransform.position, this.cameraTransform.forward);
+			BlockTargeter.HitPoint targetHit =
+				BlockTargeter.Target(this.cameraTransform.position, this.cameraTransform.forward, this.maxTargetRange);
 
-			Debug.DrawRay(ray.origin, ray.direction * this.maxTargetRange, Color.blue);
-			bool isHit = Physics.Raycast(ray, out RaycastHit hit, this.maxTargetRange);
+			Debug.DrawRay(targetHit.Position + Vector3.one/2, targetHit.EntryFaceNormal * 2, Color.blue);
+			Debug.DrawRay(targetHit.Position + Vector3.one/2, targetHit.ExitFaceNormal * 2, Color.blue);
 
-			if (!isHit) return;
-
-			Debug.DrawRay(hit.point, hit.normal, Color.blue);
-			
+			if (!targetHit.HasValue) return;
 
 			if (Input.GetButtonDown("Fire1"))
 			{
-				Vector3Int blockPosition = Vector3Int.FloorToInt(hit.point - hit.normal / 2);
-				VoxelTerrain.ActiveTerrain.RemoveBlockAt(blockPosition);
+				VoxelTerrain.ActiveTerrain.RemoveBlockAt(targetHit.Position);
 			}
 			else if (Input.GetButtonDown("Fire2"))
 			{
-				Vector3Int blockPosition = Vector3Int.FloorToInt(hit.point + hit.normal / 2);
-				VoxelTerrain.ActiveTerrain.SetBlockAt(blockPosition, 6, true);
+				VoxelTerrain.ActiveTerrain.SetBlockAt(targetHit.Position - targetHit.ExitFaceNormal, 6, true);
 			}
 				
 		}
