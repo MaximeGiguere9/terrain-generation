@@ -30,6 +30,7 @@ namespace VoxelWorld.Actors
 		private void Start()
 		{
 			Cursor.lockState = CursorLockMode.Locked;
+			BlockTargeter.DebugMode = true;
 		}
 
 		private void Update()
@@ -58,11 +59,8 @@ namespace VoxelWorld.Actors
 		{
 			BlockTargeter.HitPoint targetHit =
 				BlockTargeter.Target(this.cameraTransform.position, this.cameraTransform.forward, this.maxTargetRange);
-
-			Debug.DrawRay(targetHit.Position + Vector3.one/2, targetHit.EntryFaceNormal * 2, Color.blue);
-			Debug.DrawRay(targetHit.Position + Vector3.one/2, targetHit.ExitFaceNormal * 2, Color.blue);
-
-			if (!targetHit.HasValue) return;
+			
+			if (targetHit == null) return;
 
 			if (Input.GetButtonDown("Fire1"))
 			{
@@ -70,7 +68,7 @@ namespace VoxelWorld.Actors
 			}
 			else if (Input.GetButtonDown("Fire2"))
 			{
-				VoxelTerrain.ActiveTerrain.SetBlockAt(targetHit.Position - targetHit.ExitFaceNormal, 6, true);
+				VoxelTerrain.ActiveTerrain.SetBlockAt(targetHit.Position + targetHit.Normal, 6, true);
 			}
 				
 		}

@@ -5,6 +5,8 @@ namespace VoxelWorld.Terrain
 {
 	public class VoxelBlock
 	{
+		public static readonly Vector3 Size = Vector3Int.one;
+
 		/// <summary>
 		/// The 8 corners of the block in the right order
 		/// </summary>

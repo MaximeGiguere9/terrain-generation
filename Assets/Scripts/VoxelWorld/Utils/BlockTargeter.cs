@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using VoxelWorld.Terrain;
 
 namespace VoxelWorld.Utils
@@ -7,27 +8,17 @@ namespace VoxelWorld.Utils
 	{
 		public class HitPoint
 		{
-			public readonly bool HasValue;
 			public readonly Vector3Int Position;
-			public readonly Vector3Int EntryFaceNormal;
-			public readonly Vector3Int ExitFaceNormal;
+			public readonly Vector3Int Normal;
 
-			public HitPoint()
+			public HitPoint(Vector3Int position, Vector3Int normal)
 			{
-				this.HasValue = false;
-				this.Position = Vector3Int.zero;
-				this.EntryFaceNormal = Vector3Int.zero;
-				this.ExitFaceNormal = Vector3Int.zero;
-			}
-
-			public HitPoint(Vector3Int position, Vector3Int entryFaceNormal, Vector3Int exitFaceNormal)
-			{
-				this.HasValue = true;
 				this.Position = position;
-				this.EntryFaceNormal = entryFaceNormal;
-				this.ExitFaceNormal = exitFaceNormal;
+				this.Normal = normal;
 			}
 		}
+
+		public static bool DebugMode { get; set; } = false;
 
 		public static HitPoint Target(Vector3 position, Vector3 direction, float maxDistance)
 		{
@@ -38,76 +29,155 @@ namespace VoxelWorld.Utils
 			 *  - Execute points 1 and 2 on the new blocks in sequence until either a targetable block is found or the max distance is reached
 			 */
 
-			Vector3Int? nextBlockPos = Vector3Int.FloorToInt(position);
+			Vector3Int blockPosition = Vector3Int.FloorToInt(position);
+			HitPoint hitPoint = null;
 
-			// ReSharper disable once ConditionIsAlwaysTrueOrFalse
 			// (will exit when max distance is reached or block is found)
-			while (nextBlockPos.HasValue)
+			while (GetDistanceToBlock(position, blockPosition) <= maxDistance)
 			{
-				Vector3Int blockPosition = nextBlockPos.Value;
-				nextBlockPos = null;
+				if (DebugMode) DrawBlockOutline(blockPosition, Color.blue);
+				
+				//get normal of face through which ray exits block
+				Vector3Int? faceNormal = FindRayBoxExitNormal(position, direction, blockPosition);
 
-				Vector3Int entryFace = Vector3Int.zero;
-				Vector3Int exitFace = Vector3Int.zero;
+				if(!faceNormal.HasValue)
+					throw new InvalidOperationException($"Ray from {position} in direction {direction} does not intersect box at {blockPosition}");
 
-				for(int i = 0; i < VoxelBlock.Faces.Length; i++)
-				{
+				//march to next block in trajectory
+				Vector3Int exitFace = faceNormal.Value;
+				blockPosition += exitFace;
 
-					//face plane equation
-					Vector3 u = VoxelBlock.Vertices[VoxelBlock.FaceVertices[i][1]] -
-					            VoxelBlock.Vertices[VoxelBlock.FaceVertices[i][0]];
+				byte blockId = VoxelTerrain.ActiveTerrain.GetBlockAt(blockPosition);
 
-					Vector3 v = VoxelBlock.Vertices[VoxelBlock.FaceVertices[i][2]] -
-					            VoxelBlock.Vertices[VoxelBlock.FaceVertices[i][1]];
+				//block is empty
+				if (blockId <= 0)
+					continue; 
 
-					Vector3 p0 = VoxelBlock.Vertices[VoxelBlock.FaceVertices[i][0]] + blockPosition;
+				if(DebugMode) DrawBlockNormal(blockPosition, exitFace * -1, Color.blue);
 
-					//solving intersection with linear algebra
-					//rayOrigin + t*dir = planeOrigin + x*u + y*v <=> x*u + y*v - t*dir = rayOrigin - planeOrigin
-					Matrix4x4 matrix = new Matrix4x4();
-					matrix.SetColumn(0, u);
-					matrix.SetColumn(1, v);
-					matrix.SetColumn(2, -direction);
-					matrix.SetColumn(3, new Vector4(0, 0, 0, 1));
-
-					Matrix4x4 inverse = matrix.inverse;
-
-					if (inverse == Matrix4x4.zero)
-						continue; //inverse does not exist
-
-					Vector3 result = inverse.MultiplyVector(position - p0);
-
-					if (result.x < 0 || result.x > 1 || result.y < 0 || result.y > 1)
-						continue; //intersection outside face bounds
-					if (result.z > maxDistance)
-						continue; //target outside reach
-
-					//if larger than 0, ray exits box, otherwise ray enters box
-					float colinearity = Vector3.Dot(direction.normalized, VoxelBlock.Faces[i]);
-
-					if (colinearity <= 0)
-					{
-						entryFace = VoxelBlock.Faces[i];
-						continue;
-					}
-
-					exitFace = VoxelBlock.Faces[i];
-					nextBlockPos = blockPosition + VoxelBlock.Faces[i];
-
-					Debug.DrawLine(VoxelBlock.Vertices[VoxelBlock.FaceVertices[i][0]] + blockPosition, VoxelBlock.Vertices[VoxelBlock.FaceVertices[i][2]] + blockPosition, Color.blue);
-				}
-
-				if (!nextBlockPos.HasValue) break; //no valid block found
-
-				byte blockId = VoxelTerrain.ActiveTerrain.GetBlockAt(nextBlockPos.Value);
-
-				if (blockId > 0) return new HitPoint(nextBlockPos.Value, entryFace, exitFace); //found block
+				//found block, collision normal is inverse of current block exit point (next block entry point)
+				hitPoint = new HitPoint(blockPosition, exitFace * -1); 
+				break;
 			}
 
-			return new HitPoint();
+			return hitPoint;
 		}
 
-		//BUG! entry/exit normals match the block before the targeted one (workaround: exit normal is the opposite of the correct entry normal due to symmetry)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="origin"></param>
+		/// <param name="blockPosition"></param>
+		/// <returns></returns>
+		private static float GetDistanceToBlock(Vector3 origin, Vector3Int blockPosition)
+		{
+			return (blockPosition + VoxelBlock.Size / 2f - origin).magnitude;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="rayOrigin"></param>
+		/// <param name="rayDirection"></param>
+		/// <param name="blockPosition"></param>
+		/// <returns>The normal of the face through which the ray exists the box, or null if the ray does not intersect the box</returns>
+		private static Vector3Int? FindRayBoxExitNormal(Vector3 rayOrigin, Vector3 rayDirection, Vector3Int blockPosition)
+		{
+			for (int i = 0; i < VoxelBlock.Faces.Length; i++)
+			{
+				//find intersection for individual face plane
+				Vector3? intersection = GetRayFaceIntersection(rayOrigin, rayDirection, blockPosition, i);
+
+				//no intersection
+				if (!intersection.HasValue)
+					continue;
+
+				Vector3 result = intersection.Value;
+
+				//intersection outside face bounds
+				if (result.x < 0 || result.x > 1 || result.y < 0 || result.y > 1)
+					continue;
+
+				Vector3Int faceNormal = VoxelBlock.Faces[i];
+
+				//if larger than 0, ray exits box, otherwise ray enters box
+				float colinearity = Vector3.Dot(rayDirection.normalized, faceNormal);
+
+				//found entry face, need exit face to obtain next block position
+				if (colinearity <= 0)
+					continue;
+
+				//found exit face (unique)
+				return faceNormal;
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Solves intersection between a ray and a block's face using the inverse matrix method
+		/// </summary>
+		/// <param name="rayOrigin"></param>
+		/// <param name="rayDirection"></param>
+		/// <param name="blockPosition"></param>
+		/// <param name="faceIndex"></param>
+		/// <returns></returns>
+		private static Vector3? GetRayFaceIntersection(Vector3 rayOrigin, Vector3 rayDirection, Vector3Int blockPosition, int faceIndex)
+		{
+			//face plane equation components
+			Vector3 u = VoxelBlock.Vertices[VoxelBlock.FaceVertices[faceIndex][1]] -
+			            VoxelBlock.Vertices[VoxelBlock.FaceVertices[faceIndex][0]];
+
+			Vector3 v = VoxelBlock.Vertices[VoxelBlock.FaceVertices[faceIndex][2]] -
+			            VoxelBlock.Vertices[VoxelBlock.FaceVertices[faceIndex][1]];
+
+			Vector3 p0 = VoxelBlock.Vertices[VoxelBlock.FaceVertices[faceIndex][0]] + blockPosition;
+
+			//solving (x,y,z) intersection with linear algebra
+			//rayOrigin + t*dir = planeOrigin + x*u + y*v <=> x*u + y*v - t*dir = rayOrigin - planeOrigin
+			Matrix4x4 matrix = new Matrix4x4();
+			matrix.SetColumn(0, u);
+			matrix.SetColumn(1, v);
+			matrix.SetColumn(2, -rayDirection);
+			matrix.SetColumn(3, new Vector4(0, 0, 0, 1));
+
+			Matrix4x4 inverse = matrix.inverse;
+
+			if (inverse == Matrix4x4.zero)
+				return null; //inverse does not exist
+
+			return inverse.MultiplyVector(rayOrigin - p0);
+		}
+		
+		/// <summary>
+		/// Debug
+		/// </summary>
+		/// <param name="position"></param>
+		/// <param name="color"></param>
+		private static void DrawBlockOutline(Vector3Int position, Color color)
+		{
+			foreach (byte[] vertexIndexes in VoxelBlock.FaceVertices)
+			{
+				for (int i = 0; i < vertexIndexes.Length - 1; i++)
+				{
+					Vector3 start = position + VoxelBlock.Vertices[vertexIndexes[i]];
+					Vector3 end = position + VoxelBlock.Vertices[vertexIndexes[i + 1]];
+
+					Debug.DrawLine(start, end, color);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Debug
+		/// </summary>
+		/// <param name="position"></param>
+		/// <param name="faceNormal"></param>
+		/// <param name="color"></param>
+		private static void DrawBlockNormal(Vector3 position, Vector3 faceNormal, Color color)
+		{
+			Debug.DrawRay(position + VoxelBlock.Size / 2, faceNormal / 2, color);
+		}
 
 	}
 }
