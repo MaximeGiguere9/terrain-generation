@@ -57,9 +57,9 @@ namespace VoxelWorld.Terrain
 		{
 			while (this.redrawQueue.Count > 0)
 			{
+				yield return null;
 				VoxelChunk chunk = this.redrawQueue.Dequeue();
 				chunk.Redraw();
-				yield return null;
 			}
 		}
 
@@ -74,8 +74,7 @@ namespace VoxelWorld.Terrain
 
 			if (!redraw) return;
 
-			foreach (Vector3Int offset in Neighbors)
-				Redraw(GetChunkAt(chunkPosition + offset));
+			RedrawAround(position);
 		}
 
 		public byte GetBlockAt(Vector3Int position)
@@ -96,10 +95,18 @@ namespace VoxelWorld.Terrain
 			byte removedBlock = chunk.RemoveBlockAt(position);
 			if (removedBlock == 0) return 0;
 
-			foreach (Vector3Int offset in Neighbors)
-				Redraw(GetChunkAt(chunkPosition + offset));
+			RedrawAround(position);
 
 			return removedBlock;
+		}
+
+		private void RedrawAround(Vector3Int position)
+		{
+			foreach (Vector3Int offset in Neighbors)
+			{
+				Vector3Int chunkPosition = GetContainingChunkPosition(position + offset);
+				Redraw(GetChunkAt(chunkPosition));
+			}
 		}
 
 		public VoxelChunk CreateChunk(Vector3Int position)

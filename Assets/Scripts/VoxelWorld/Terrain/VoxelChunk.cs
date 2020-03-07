@@ -7,6 +7,8 @@ namespace VoxelWorld.Terrain
 {
 	public class VoxelChunk : MonoBehaviour
 	{
+		public static bool DebugMode { get; set; } = false;
+
 		private static int ChunkSize => VoxelWorldSettings.Instance.ChunkSize;
 
 		[SerializeField] private MeshFilter meshFilter;
@@ -84,6 +86,8 @@ namespace VoxelWorld.Terrain
 			mesh.RecalculateTangents();
 
 			this.meshFilter.mesh = mesh;
+
+			if(DebugMode) Debug.Log($"Redrew chunk at {this.position}");
 		}
 	}
 }
