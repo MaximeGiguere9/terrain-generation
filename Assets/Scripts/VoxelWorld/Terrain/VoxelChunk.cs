@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using VoxelWorld.Utils;
@@ -58,9 +58,9 @@ namespace VoxelWorld.Terrain
 		{
 			Mesh mesh = new Mesh();
 
-			List<Vector3> vertices = new List<Vector3>();
-			List<int> triangles = new List<int>();
-			List<Vector2> uvs = new List<Vector2>();
+			List<Vector3> vertices = new List<Vector3>(10000);
+			List<int> triangles = new List<int>(10000);
+			List<Vector2> uvs = new List<Vector2>(10000);
 
 			CoordinateIterator itr = new CoordinateIterator(Vector3Int.one * ChunkSize, Vector3Int.zero);
 
