@@ -1,11 +1,10 @@
 ﻿using System;
-using UnityEngine;
 
-namespace Noise
+namespace VoxelWorld.Utils
 {
-	public class PerlinNoise : NoiseSampler
+	public class PerlinNoise
 	{
-		public override float Sample(float x, float y, float z) => Noise(x, y, z);
+		public float Sample(float x, float y, float z) => Noise(x, y, z);
 
 		private static float Noise(float x, float y, float z)
 		{

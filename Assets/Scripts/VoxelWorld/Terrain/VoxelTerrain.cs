@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VoxelWorld.Terrain.Generators;
+using VoxelWorld.Terrain.Generators.Abstractions;
 
 namespace VoxelWorld.Terrain
 {
@@ -9,8 +11,10 @@ namespace VoxelWorld.Terrain
 		public static VoxelTerrain ActiveTerrain;
 		private static void SetActiveTerrain(VoxelTerrain world) => ActiveTerrain = world; 
 
-		private static GameObject ChunkPrefab => VoxelWorldSettings.Instance.ChunkPrefab;
-		private static int ChunkSize => VoxelWorldSettings.Instance.ChunkSize;
+		private static GameObject ChunkPrefab => VoxelSettings.Instance.ChunkPrefab;
+		private static int ChunkSize => VoxelSettings.Instance.ChunkSize;
+
+		[SerializeField] private TerrainGeneratorType terrainGeneratorType;
 
 		public static readonly Vector3Int[] Neighbors =
 		{
@@ -30,6 +34,19 @@ namespace VoxelWorld.Terrain
 		private void Awake()
 		{
 			SetActiveTerrain(this);
+		}
+
+		private void Start()
+		{
+			ITerrainGenerator terrainGenerator = TerrainGeneratorFactory.GetTerrainGenerator(this.terrainGeneratorType);
+			terrainGenerator.GenerateAll();
+			StartCoroutine(Redraw());
+		}
+
+		private IEnumerator Redraw()
+		{
+			yield return new WaitForEndOfFrame();
+			VoxelTerrain.ActiveTerrain.RedrawAll();
 		}
 
 		public void Redraw(VoxelChunk chunk, bool immediate = false)

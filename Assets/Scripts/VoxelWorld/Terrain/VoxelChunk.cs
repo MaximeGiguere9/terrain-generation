@@ -9,7 +9,7 @@ namespace VoxelWorld.Terrain
 	{
 		public static bool DebugMode { get; set; } = false;
 
-		private static int ChunkSize => VoxelWorldSettings.Instance.ChunkSize;
+		private static int ChunkSize => VoxelSettings.Instance.ChunkSize;
 
 		[SerializeField] private MeshFilter meshFilter;
 		[SerializeField] private MeshCollider meshCollider;
