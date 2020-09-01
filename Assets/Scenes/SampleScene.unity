@@ -1021,6 +1021,7 @@ GameObject:
   - component: {fileID: 1484056205}
   - component: {fileID: 1484056203}
   - component: {fileID: 1484056202}
+  - component: {fileID: 1484056204}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1064,6 +1065,20 @@ MonoBehaviour:
   maxPitch: 80
   movementSpeed: 10
   maxTargetRange: 3
+--- !u!114 &1484056204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1484056201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17080459b8ef4e65aa5ff4b96e6033e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 1484056201}
+  radius: 5
 --- !u!4 &1484056205
 Transform:
   m_ObjectHideFlags: 0

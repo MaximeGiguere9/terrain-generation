@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using VoxelWorld.Terrain.Generators.Abstractions;
 
@@ -16,6 +17,8 @@ namespace VoxelWorld.Terrain
 		[SerializeField] private TerrainGeneratorType terrainGeneratorType;
 
 		private bool redrawQueued = false;
+
+		private ITerrainGenerator terrainGenerator;
 
 		public static readonly Vector3Int[] Neighbors =
 		{
@@ -39,7 +42,7 @@ namespace VoxelWorld.Terrain
 
 		private void Start()
 		{
-			ITerrainGenerator terrainGenerator = TerrainGeneratorFactory.GetTerrainGenerator(this.terrainGeneratorType);
+			this.terrainGenerator = TerrainGeneratorFactory.GetTerrainGenerator(this.terrainGeneratorType);
 
 			if (!terrainGenerator.SupportsInfiniteGeneration())
 			{
@@ -51,15 +54,40 @@ namespace VoxelWorld.Terrain
 			terrainGenerator.Initialize();
 
 			// in theory supports generating any arbitrary chunk at runtime (infinite gen)
-			for (int x = -10; x < 10; x++)
+			/*for (int x = -10; x < 10; x++)
 			{
 				for (int z = -10; z < 10; z++)
 				{
 					terrainGenerator.GenerateVerticalChunks(x, z);
 					StartCoroutine(QueueRedrawAll());
 				}
-			}
+			}*/
 			
+		}
+
+		private void Update()
+		{
+			foreach (VoxelChunk chunk in this.redrawQueue)
+			{
+				int s = VoxelSettings.Instance.ChunkSize;
+				Vector3Int p = chunk.Position;
+
+				Debug.DrawLine(p * s, (p + new Vector3Int(1, 0, 0)) * s, Color.magenta);
+				Debug.DrawLine(p * s, (p + new Vector3Int(0, 1, 0)) * s, Color.magenta);
+				Debug.DrawLine(p * s, (p + new Vector3Int(0, 0, 1)) * s, Color.magenta);
+
+				Debug.DrawLine((p + new Vector3Int(1, 1, 0)) * s, (p + new Vector3Int(0, 1, 0)) * s, Color.magenta);
+				Debug.DrawLine((p + new Vector3Int(1, 1, 0)) * s, (p + new Vector3Int(1, 0, 0)) * s, Color.magenta);
+				Debug.DrawLine((p + new Vector3Int(1, 1, 0)) * s, (p + new Vector3Int(1, 1, 1)) * s, Color.magenta);
+
+				Debug.DrawLine((p + new Vector3Int(0, 1, 1)) * s, (p + new Vector3Int(1, 1, 1)) * s, Color.magenta);
+				Debug.DrawLine((p + new Vector3Int(0, 1, 1)) * s, (p + new Vector3Int(0, 0, 1)) * s, Color.magenta);
+				Debug.DrawLine((p + new Vector3Int(0, 1, 1)) * s, (p + new Vector3Int(0, 1, 0)) * s, Color.magenta);
+
+				Debug.DrawLine((p + new Vector3Int(1, 0, 1)) * s, (p + new Vector3Int(0, 0, 1)) * s, Color.magenta);
+				Debug.DrawLine((p + new Vector3Int(1, 0, 1)) * s, (p + new Vector3Int(1, 1, 1)) * s, Color.magenta);
+				Debug.DrawLine((p + new Vector3Int(1, 0, 1)) * s, (p + new Vector3Int(1, 0, 0)) * s, Color.magenta);
+			}
 		}
 
 		private IEnumerator QueueRedrawAll()
@@ -176,8 +204,26 @@ namespace VoxelWorld.Terrain
 			);
 		}
 
-		
+		public void LoadChunks(IEnumerable<Vector2Int> chunkPositions)
+		{
+			foreach (Vector2Int pos in chunkPositions)
+			{
+				this.terrainGenerator.GenerateVerticalChunks(pos.x, pos.y);
+				IEnumerable<KeyValuePair<Vector3Int, VoxelChunk>> chunksToRedraw = this.ChunkMap.Where(kvp => kvp.Key.x == pos.x && kvp.Key.z == pos.y);
+				foreach (KeyValuePair<Vector3Int, VoxelChunk> kvp in chunksToRedraw)
+				{
+					Redraw(kvp.Value);
+				}
+			}
+		}
 
-		
+		public void UnloadChunks(IEnumerable<Vector2Int> chunkPositions)
+		{
+			foreach (Vector2Int pos in chunkPositions)
+			{
+				//terrainGenerator.GenerateVerticalChunks(pos.x, pos.y);
+				//StartCoroutine(QueueRedrawAll());
+			}
+		}
 	}
 }

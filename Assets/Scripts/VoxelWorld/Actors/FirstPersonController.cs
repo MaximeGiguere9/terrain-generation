@@ -30,7 +30,7 @@ namespace VoxelWorld.Actors
 		private void Start()
 		{
 			Cursor.lockState = CursorLockMode.Locked;
-			BlockTargeter.DebugMode = true;
+			//BlockTargeter.DebugMode = true;
 		}
 
 		private void Update()
