@@ -16,11 +16,12 @@ MonoBehaviour:
     type: 3}
   ChunkSize: 16
   WorldSize: {x: 64, y: 32, z: 64}
+  BaselineHeight: 32
   Seed: 23123
   Scale: 0.005
   Offset: {x: 10, y: 124, z: 234}
   Octaves: 3
-  Persistence: 0.5
+  Persistence: 0.25
   Lacunarity: 4
   Density:
     serializedVersion: 2

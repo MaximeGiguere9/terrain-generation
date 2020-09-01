@@ -2,6 +2,9 @@
 {
 	public interface ITerrainGenerator
 	{
+		bool SupportsInfiniteGeneration();
 		void GenerateAll();
+		void Initialize();
+		void GenerateVerticalChunks(int chunkX, int chunkZ);
 	}
 }

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using VoxelWorld.Terrain.Generators;
 using VoxelWorld.Terrain.Generators.Abstractions;
 
 namespace VoxelWorld.Terrain
@@ -15,6 +14,8 @@ namespace VoxelWorld.Terrain
 		private static int ChunkSize => VoxelSettings.Instance.ChunkSize;
 
 		[SerializeField] private TerrainGeneratorType terrainGeneratorType;
+
+		private bool redrawQueued = false;
 
 		public static readonly Vector3Int[] Neighbors =
 		{
@@ -39,14 +40,35 @@ namespace VoxelWorld.Terrain
 		private void Start()
 		{
 			ITerrainGenerator terrainGenerator = TerrainGeneratorFactory.GetTerrainGenerator(this.terrainGeneratorType);
-			terrainGenerator.GenerateAll();
-			StartCoroutine(Redraw());
+
+			if (!terrainGenerator.SupportsInfiniteGeneration())
+			{
+				terrainGenerator.GenerateAll();
+				StartCoroutine(QueueRedrawAll());
+				return;
+			}
+
+			terrainGenerator.Initialize();
+
+			// in theory supports generating any arbitrary chunk at runtime (infinite gen)
+			for (int x = -10; x < 10; x++)
+			{
+				for (int z = -10; z < 10; z++)
+				{
+					terrainGenerator.GenerateVerticalChunks(x, z);
+					StartCoroutine(QueueRedrawAll());
+				}
+			}
+			
 		}
 
-		private IEnumerator Redraw()
+		private IEnumerator QueueRedrawAll()
 		{
+			if (this.redrawQueued) yield break;
+			this.redrawQueued = true;
 			yield return new WaitForEndOfFrame();
-			VoxelTerrain.ActiveTerrain.RedrawAll();
+			RedrawAll();
+			this.redrawQueued = false;
 		}
 
 		public void Redraw(VoxelChunk chunk, bool immediate = false)

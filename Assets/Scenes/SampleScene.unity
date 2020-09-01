@@ -409,7 +409,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30ff4d2fdabd41deac63ae00b782ad10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  terrainGeneratorType: 0
+  terrainGeneratorType: 2
 --- !u!4 &794511558
 Transform:
   m_ObjectHideFlags: 0

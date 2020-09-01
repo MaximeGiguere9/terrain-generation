@@ -4,7 +4,7 @@ namespace VoxelWorld.Utils
 {
 	public class PerlinNoise
 	{
-		public float Sample(float x, float y, float z) => Noise(x, y, z);
+		public static float Sample(float x, float y, float z) => Noise(x, y, z);
 
 		private static float Noise(float x, float y, float z)
 		{

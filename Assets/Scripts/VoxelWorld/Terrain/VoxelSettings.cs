@@ -18,7 +18,11 @@ namespace VoxelWorld.Terrain
 		[Tooltip("Cubic size of chunks. Default is 16x16x16")]
 		public int ChunkSize = 16;
 
+		[Tooltip("World dimensions in finite generation")]
 		public Vector3Int WorldSize;
+
+		[Tooltip("Reference value for height in infinite generation")]
+		public int BaselineHeight = 32;
 
 		[Header("Noise Settings")]
 

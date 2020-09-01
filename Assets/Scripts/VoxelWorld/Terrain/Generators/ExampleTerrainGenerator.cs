@@ -8,6 +8,8 @@ namespace VoxelWorld.Terrain.Generators
 	{
 		private float[,] noiseMap;
 
+		public bool SupportsInfiniteGeneration() => false;
+
 		public void GenerateAll()
 		{
 			int seed = VoxelSettings.Instance.Seed;
@@ -92,6 +94,16 @@ namespace VoxelWorld.Terrain.Generators
 				}
 
 			}
+		}
+
+		public void Initialize()
+		{
+			throw new System.NotSupportedException();
+		}
+
+		public void GenerateVerticalChunks(int chunkX, int chunkZ)
+		{
+			throw new System.NotSupportedException();
 		}
 	}
 }
