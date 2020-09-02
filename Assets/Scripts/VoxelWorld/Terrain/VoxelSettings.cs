@@ -24,6 +24,9 @@ namespace VoxelWorld.Terrain
 		[Tooltip("Reference value for height in infinite generation")]
 		public int BaselineHeight = 32;
 
+		[Tooltip("Scale of the biome map")]
+		public float BiomeScale = 1;
+
 		[Header("Noise Settings")]
 
 		public int Seed;

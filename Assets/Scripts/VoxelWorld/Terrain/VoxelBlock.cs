@@ -136,6 +136,21 @@ namespace VoxelWorld.Terrain
 				6,
 				new BlockTypeConfig
 					{blockId = 6, name = "brick", textureIds = new[] {247, 247, 247, 247, 247, 247}, isOpaque = true}
+			},
+			{
+				7,
+				new BlockTypeConfig
+					{blockId = 7, name = "water", textureIds = new [] {61, 61, 61, 61, 61, 61}, isOpaque = false}
+			},
+			{
+				8,
+				new BlockTypeConfig
+					{blockId = 8, name = "snow", textureIds = new [] {178, 178, 178, 178, 178, 178}, isOpaque = true}
+			},
+			{
+				9,
+				new BlockTypeConfig
+					{blockId = 9, name = "sand", textureIds = new [] {226, 226, 226, 226, 226, 226}, isOpaque = true}
 			}
 		};
 	}

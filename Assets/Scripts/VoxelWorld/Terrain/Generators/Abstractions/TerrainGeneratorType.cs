@@ -4,6 +4,8 @@
 	{
 		ExampleTerrain,
 		ExampleCave,
-		ExampleInfiniteTerrain
+		ExampleInfiniteTerrain,
+		ExampleInfinitePlateau,
+		ExampleInfiniteBiomes
 	}
 }

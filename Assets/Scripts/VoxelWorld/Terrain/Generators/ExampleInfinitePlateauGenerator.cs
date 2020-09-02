@@ -6,7 +6,7 @@ using VoxelWorld.Utils;
 
 namespace VoxelWorld.Terrain.Generators
 {
-	public class ExampleInfiniteTerrainGenerator : ITerrainGenerator
+	public class ExampleInfinitePlateauGenerator : ITerrainGenerator
 	{
 		private int seed;
 		private int octaves;
@@ -21,7 +21,10 @@ namespace VoxelWorld.Terrain.Generators
 
 		public bool SupportsInfiniteGeneration() => true;
 
-		public void GenerateAll() => throw new NotSupportedException();
+		public void GenerateAll()
+		{
+			throw new NotSupportedException();
+		}
 
 		public void Initialize()
 		{
@@ -54,7 +57,7 @@ namespace VoxelWorld.Terrain.Generators
 		/// <param name="chunkZ"></param>
 		public void GenerateVerticalChunks(int chunkX, int chunkZ)
 		{
-			Dictionary<Tuple<int,int>, float> noiseMap = new Dictionary<Tuple<int, int>, float>();
+			Dictionary<Tuple<int, int>, float> noiseMap = new Dictionary<Tuple<int, int>, float>();
 
 			CoordinateIterator iterator = new CoordinateIterator(
 				new Vector3Int(this.chunkSize, 1, this.chunkSize),
@@ -78,7 +81,7 @@ namespace VoxelWorld.Terrain.Generators
 					frequency *= lacunarity;
 				}
 
-				noiseMap[new Tuple<int, int>(pos.x, pos.z)] = noise;
+				noiseMap[new Tuple<int, int>(pos.x, pos.z)] = Mathf.Round(noise * 20) / 20;
 			}
 
 			iterator.Reset();
@@ -100,9 +103,7 @@ namespace VoxelWorld.Terrain.Generators
 					byte blockId;
 
 					if (y == 0) blockId = 2;
-					else if (y == height - 1) blockId = 5;
-					else if (y == height - 2) blockId = 4;
-					else if (y > height - 5) blockId = 3;
+					else if (y > height - 5) blockId = 9;
 					else blockId = 1;
 
 					VoxelTerrain.ActiveTerrain.SetBlockAt(new Vector3Int(x, y, z), blockId);
