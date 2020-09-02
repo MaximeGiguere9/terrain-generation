@@ -16,6 +16,8 @@ namespace VoxelWorld.Terrain
 
 		private byte[,,] blocks;
 
+		public bool Loaded { get; set; }
+
 		private Vector3Int position;
 		public Vector3Int Position
 		{
@@ -57,6 +59,12 @@ namespace VoxelWorld.Terrain
 
 		public void Redraw()
 		{
+			if (!this.Loaded)
+			{
+				Destroy(this.gameObject);
+				return;
+			}
+
 			Mesh mesh = new Mesh();
 
 			List<Vector3> vertices = new List<Vector3>(10000);

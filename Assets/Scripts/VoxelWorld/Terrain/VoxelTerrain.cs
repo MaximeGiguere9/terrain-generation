@@ -125,8 +125,15 @@ namespace VoxelWorld.Terrain
 			while (this.redrawQueue.Count > 0)
 			{
 				yield return null;
-				VoxelChunk chunk = this.redrawQueue.Dequeue();
-				chunk.Redraw();
+				VoxelChunk chunk = null;
+				while (chunk == null && this.redrawQueue.Count > 0)
+				{
+					chunk = this.redrawQueue.Dequeue();
+				}
+				if (chunk != null)
+				{
+					chunk.Redraw();
+				}
 			}
 		}
 
@@ -209,9 +216,18 @@ namespace VoxelWorld.Terrain
 			foreach (Vector2Int pos in chunkPositions)
 			{
 				this.terrainGenerator.GenerateVerticalChunks(pos.x, pos.y);
-				IEnumerable<KeyValuePair<Vector3Int, VoxelChunk>> chunksToRedraw = this.ChunkMap.Where(kvp => kvp.Key.x == pos.x && kvp.Key.z == pos.y);
+				IEnumerable<KeyValuePair<Vector3Int, VoxelChunk>> chunksToRedraw = this.ChunkMap.Where(kvp =>
+					kvp.Key.x >= pos.x - 1 &&
+					kvp.Key.x <= pos.x + 1 &&
+					kvp.Key.z >= pos.y - 1 &&
+					kvp.Key.z <= pos.y + 1
+				);
 				foreach (KeyValuePair<Vector3Int, VoxelChunk> kvp in chunksToRedraw)
 				{
+					if (kvp.Key.x == pos.x && kvp.Key.z == pos.y)
+					{
+						kvp.Value.Loaded = true;
+					}
 					Redraw(kvp.Value);
 				}
 			}
@@ -219,10 +235,34 @@ namespace VoxelWorld.Terrain
 
 		public void UnloadChunks(IEnumerable<Vector2Int> chunkPositions)
 		{
+			List<Vector3Int> keysToRemove = new List<Vector3Int>();
+
 			foreach (Vector2Int pos in chunkPositions)
 			{
-				//terrainGenerator.GenerateVerticalChunks(pos.x, pos.y);
-				//StartCoroutine(QueueRedrawAll());
+				IEnumerable<KeyValuePair<Vector3Int, VoxelChunk>> chunksToDelete = this.ChunkMap.Where(kvp =>
+					kvp.Key.x >= pos.x - 1 &&
+					kvp.Key.x <= pos.x + 1 &&
+					kvp.Key.z >= pos.y - 1 &&
+					kvp.Key.z <= pos.y + 1
+				);
+				foreach (KeyValuePair<Vector3Int, VoxelChunk> kvp in chunksToDelete)
+				{
+					if (kvp.Key.x == pos.x && kvp.Key.z == pos.y)
+					{
+						kvp.Value.Loaded = false;
+						keysToRemove.Add(kvp.Key);
+						Redraw(kvp.Value, true);
+					}
+					else
+					{
+						Redraw(kvp.Value);
+					}
+				}
+			}
+
+			foreach (Vector3Int key in keysToRemove)
+			{
+				this.ChunkMap.Remove(key);
 			}
 		}
 	}
