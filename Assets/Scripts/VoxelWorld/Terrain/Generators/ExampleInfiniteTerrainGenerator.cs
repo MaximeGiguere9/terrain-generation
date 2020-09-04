@@ -102,13 +102,27 @@ namespace VoxelWorld.Terrain.Generators
 				{
 					byte blockId;
 
-					if (y == 0) blockId = 2;
-					else if (y == height - 1) blockId = 5;
-					else if (y == height - 2) blockId = 4;
-					else if (y > height - 5) blockId = 3;
-					else blockId = 1;
+					if (height >= VoxelSettings.Instance.WaterLevel)
+					{
+						if (y == 0) blockId = 2;
+						else if (y == height - 1) blockId = 5;
+						else if (y == height - 2) blockId = 4;
+						else if (y > height - 5) blockId = 3;
+						else blockId = 1;
+					}
+					else
+					{
+						if (y == 0) blockId = 2;
+						else if (y > height - 5) blockId = 3;
+						else blockId = 1;
+					}
 
 					VoxelTerrain.ActiveTerrain.SetBlockAt(new Vector3Int(x, y, z), blockId);
+				}
+
+				for (int y = height; y < VoxelSettings.Instance.WaterLevel; y++)
+				{
+					VoxelTerrain.ActiveTerrain.SetBlockAt(new Vector3Int(x, y, z), 7);
 				}
 			}
 		}

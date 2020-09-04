@@ -140,7 +140,7 @@ namespace VoxelWorld.Terrain
 			{
 				7,
 				new BlockTypeConfig
-					{blockId = 7, name = "water", textureIds = new [] {61, 61, 61, 61, 61, 61}, isOpaque = false}
+					{blockId = 7, name = "water", textureIds = new [] {61, 61, 61, 61, 61, 61}, isOpaque = true}
 			},
 			{
 				8,

@@ -112,6 +112,11 @@ namespace VoxelWorld.Terrain.Generators
 					VoxelTerrain.ActiveTerrain.SetBlockAt(new Vector3Int(x, y, z), blockId);
 				}
 
+				for (int y = height; y < VoxelSettings.Instance.WaterLevel; y++)
+				{
+					VoxelTerrain.ActiveTerrain.SetBlockAt(new Vector3Int(x, y, z), 7);
+				}
+
 			}
 		}
 	}
