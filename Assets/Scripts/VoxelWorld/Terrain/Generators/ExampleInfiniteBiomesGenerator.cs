@@ -59,16 +59,30 @@ namespace VoxelWorld.Terrain.Generators
 			this.plateauGenerator.Initialize();
 		}
 
-		public void GenerateVerticalChunks(int chunkX, int chunkZ)
+		public void Generate(int chunkX, int chunkZ)
 		{
-			float noise = Mathf.PerlinNoise(chunkX * this.biomeScale, chunkZ * this.biomeScale);
-			if (noise > 0.5f)
+			Generate(new CoordinateIterator(
+				new Vector3Int(this.chunkSize, 1, this.chunkSize),
+				new Vector3Int(chunkX * this.chunkSize, 0, chunkZ * this.chunkSize)
+			));
+		}
+
+		public void Generate(CoordinateIterator iterator)
+		{
+			foreach (Vector3Int pos in iterator)
 			{
-				this.plateauGenerator.GenerateVerticalChunks(chunkX, chunkZ);
-			}
-			else
-			{
-				this.plainsGenerator.GenerateVerticalChunks(chunkX, chunkZ);
+				float noise = Mathf.PerlinNoise(pos.x * this.biomeScale, pos.z * this.biomeScale);
+
+				CoordinateIterator itr = new CoordinateIterator(Vector3Int.one, pos);
+
+				if (noise > 0.5f)
+				{
+					this.plateauGenerator.Generate(itr);
+				}
+				else
+				{
+					this.plainsGenerator.Generate(itr);
+				}
 			}
 		}
 	}

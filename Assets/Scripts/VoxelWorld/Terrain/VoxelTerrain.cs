@@ -58,7 +58,7 @@ namespace VoxelWorld.Terrain
 			{
 				for (int z = -10; z < 10; z++)
 				{
-					terrainGenerator.GenerateVerticalChunks(x, z);
+					terrainGenerator.Generate(x, z);
 					StartCoroutine(QueueRedrawAll());
 				}
 			}*/
@@ -215,7 +215,7 @@ namespace VoxelWorld.Terrain
 		{
 			foreach (Vector2Int pos in chunkPositions)
 			{
-				this.terrainGenerator.GenerateVerticalChunks(pos.x, pos.y);
+				this.terrainGenerator.Generate(pos.x, pos.y);
 				IEnumerable<KeyValuePair<Vector3Int, VoxelChunk>> chunksToRedraw = this.ChunkMap.Where(kvp =>
 					kvp.Key.x >= pos.x - 1 &&
 					kvp.Key.x <= pos.x + 1 &&

@@ -17,7 +17,7 @@ MonoBehaviour:
   ChunkSize: 16
   WorldSize: {x: 64, y: 32, z: 64}
   BaselineHeight: 32
-  BiomeScale: 0.05
+  BiomeScale: 0.001
   Seed: 23123
   Scale: 0.005
   Offset: {x: 10, y: 124, z: 234}

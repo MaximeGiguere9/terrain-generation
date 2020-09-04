@@ -93,7 +93,12 @@ namespace VoxelWorld.Terrain.Generators
 			throw new System.NotSupportedException();
 		}
 
-		public void GenerateVerticalChunks(int chunkX, int chunkZ)
+		public void Generate(int chunkX, int chunkZ)
+		{
+			throw new System.NotSupportedException();
+		}
+
+		public void Generate(CoordinateIterator iterator)
 		{
 			throw new System.NotSupportedException();
 		}

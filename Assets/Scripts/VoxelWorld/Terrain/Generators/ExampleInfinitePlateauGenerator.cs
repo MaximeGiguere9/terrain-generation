@@ -55,14 +55,17 @@ namespace VoxelWorld.Terrain.Generators
 		/// </summary>
 		/// <param name="chunkX"></param>
 		/// <param name="chunkZ"></param>
-		public void GenerateVerticalChunks(int chunkX, int chunkZ)
+		public void Generate(int chunkX, int chunkZ)
 		{
-			Dictionary<Tuple<int, int>, float> noiseMap = new Dictionary<Tuple<int, int>, float>();
-
-			CoordinateIterator iterator = new CoordinateIterator(
+			Generate(new CoordinateIterator(
 				new Vector3Int(this.chunkSize, 1, this.chunkSize),
 				new Vector3Int(chunkX * this.chunkSize, 0, chunkZ * this.chunkSize)
-			);
+			));
+		}
+
+		public void Generate(CoordinateIterator iterator)
+		{
+			Dictionary<Tuple<int, int>, float> noiseMap = new Dictionary<Tuple<int, int>, float>();
 
 			foreach (Vector3Int pos in iterator)
 			{
