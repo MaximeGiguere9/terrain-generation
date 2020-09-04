@@ -44,14 +44,15 @@ namespace VoxelWorld.Terrain
 		{
 			this.terrainGenerator = TerrainGeneratorFactory.GetTerrainGenerator(this.terrainGeneratorType);
 
-			if (!terrainGenerator.SupportsInfiniteGeneration())
+			if (!this.terrainGenerator.SupportsInfiniteGeneration())
 			{
-				terrainGenerator.GenerateAll();
+				this.terrainGenerator.GenerateAll();
+				foreach (VoxelChunk chunk in this.ChunkMap.Values) chunk.Loaded = true;
 				StartCoroutine(QueueRedrawAll());
 				return;
 			}
 
-			terrainGenerator.Initialize();
+			this.terrainGenerator.Initialize();
 
 			// in theory supports generating any arbitrary chunk at runtime (infinite gen)
 			/*for (int x = -10; x < 10; x++)
@@ -213,6 +214,8 @@ namespace VoxelWorld.Terrain
 
 		public void LoadChunks(IEnumerable<Vector2Int> chunkPositions)
 		{
+			if (!this.terrainGenerator.SupportsInfiniteGeneration()) return;
+
 			foreach (Vector2Int pos in chunkPositions)
 			{
 				this.terrainGenerator.Generate(pos.x, pos.y);
@@ -235,6 +238,8 @@ namespace VoxelWorld.Terrain
 
 		public void UnloadChunks(IEnumerable<Vector2Int> chunkPositions)
 		{
+			if (!this.terrainGenerator.SupportsInfiniteGeneration()) return;
+
 			List<Vector3Int> keysToRemove = new List<Vector3Int>();
 
 			foreach (Vector2Int pos in chunkPositions)
