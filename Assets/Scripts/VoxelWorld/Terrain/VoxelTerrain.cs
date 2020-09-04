@@ -186,6 +186,11 @@ namespace VoxelWorld.Terrain
 
 		public VoxelChunk CreateChunk(Vector3Int position)
 		{
+			if (ChunkMap.ContainsKey(position))
+			{
+				return ChunkMap[position];
+			}
+
 			VoxelChunk chunk = Instantiate(ChunkPrefab, Vector3.zero, Quaternion.identity, this.transform).GetComponent<VoxelChunk>();
 			chunk.Position = position;
 			RegisterChunk(chunk);

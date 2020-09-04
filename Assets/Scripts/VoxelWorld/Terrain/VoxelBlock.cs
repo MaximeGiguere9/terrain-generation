@@ -152,6 +152,11 @@ namespace VoxelWorld.Terrain
 				9,
 				new BlockTypeConfig
 					{blockId = 9, name = "sand", textureIds = new [] {226, 226, 226, 226, 226, 226}, isOpaque = true, renderNeighbors = true}
+			},
+			{
+				10,
+				new BlockTypeConfig
+					{blockId = 10, name = "wood", textureIds = new [] {228, 228, 229, 229, 228, 228}, isOpaque = true, renderNeighbors = true}
 			}
 		};
 	}

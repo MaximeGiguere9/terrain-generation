@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using VoxelWorld.Terrain.Generators.Abstractions;
 using VoxelWorld.Utils;
@@ -105,8 +106,7 @@ namespace VoxelWorld.Terrain.Generators
 					if (height >= VoxelSettings.Instance.WaterLevel)
 					{
 						if (y == 0) blockId = 2;
-						else if (y == height - 1) blockId = 5;
-						else if (y == height - 2) blockId = 4;
+						else if (y == height - 1) blockId = 4;
 						else if (y > height - 5) blockId = 3;
 						else blockId = 1;
 					}
@@ -123,6 +123,15 @@ namespace VoxelWorld.Terrain.Generators
 				for (int y = height; y < VoxelSettings.Instance.WaterLevel; y++)
 				{
 					VoxelTerrain.ActiveTerrain.SetBlockAt(new Vector3Int(x, y, z), 7);
+				}
+
+				if ((pos.x + this.chunkSize / 2) % this.chunkSize != 0 || (pos.z + this.chunkSize / 2) % this.chunkSize != 0 || height < VoxelSettings.Instance.WaterLevel) continue;
+
+				var tree = TreeStructure.Generate();
+
+				foreach (var kvp in tree.Where(kvp => VoxelTerrain.ActiveTerrain.GetBlockAt(kvp.Key) == 0))
+				{
+					VoxelTerrain.ActiveTerrain.SetBlockAt(kvp.Key + new Vector3Int(pos.x, height, pos.z), kvp.Value);
 				}
 			}
 		}
