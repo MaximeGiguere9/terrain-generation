@@ -80,7 +80,12 @@ namespace VoxelWorld.Terrain
 
 				for (int i = 0; i < VoxelBlock.Faces.Length; i++)
 				{
-					if(!VoxelBlock.IsFaceVisible(GetWorldPosition(pos), i)) continue;
+					
+					bool isNeighborSameBlock = VoxelTerrain.ActiveTerrain.GetBlockAt(pos + this.position * ChunkSize + VoxelBlock.Faces[i]) == block;
+					bool isFaceVisible = VoxelBlock.IsFaceVisible(GetWorldPosition(pos), i) && (VoxelBlock.Blocks[block].renderNeighbors || !isNeighborSameBlock);
+
+
+					if (!isFaceVisible) continue;
 
 					vertices.AddRange(VoxelBlock.GetFaceVertices(pos, i));
 					uvs.AddRange(VoxelBlock.GetFaceUVs(block, i));

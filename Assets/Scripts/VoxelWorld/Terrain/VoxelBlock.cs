@@ -75,7 +75,7 @@ namespace VoxelWorld.Terrain
 		
 		public static Vector2[] GetFaceUVs(byte blockId, int faceIndex)
 		{
-			int ti = blocks[blockId].textureIds[faceIndex];
+			int ti = Blocks[blockId].textureIds[faceIndex];
 			int x = ti % 16;
 			int y = ti / 16;
 			return new[]
@@ -89,7 +89,7 @@ namespace VoxelWorld.Terrain
 
 		public static bool IsOpaque(byte blockId)
 		{
-			return blocks.TryGetValue(blockId, out BlockTypeConfig value) && value.isOpaque;
+			return Blocks.TryGetValue(blockId, out BlockTypeConfig value) && value.isOpaque;
 		}
 
 		public static bool IsFaceVisible(Vector3Int position, int faceIndex)
@@ -97,60 +97,61 @@ namespace VoxelWorld.Terrain
 			return !IsOpaque(VoxelTerrain.ActiveTerrain.GetBlockAt(position + Faces[faceIndex]));
 		}
 
-		private class BlockTypeConfig
+		public class BlockTypeConfig
 		{
 			public byte blockId;
 			public string name;
 			public int[] textureIds;
 			public bool isOpaque;
+			public bool renderNeighbors;
 		}
 
-		private static readonly Dictionary<byte, BlockTypeConfig> blocks = new Dictionary<byte, BlockTypeConfig>
+		public static readonly Dictionary<byte, BlockTypeConfig> Blocks = new Dictionary<byte, BlockTypeConfig>
 		{
 			{
 				1,
 				new BlockTypeConfig
-					{blockId = 1, name = "stone", textureIds = new[] {241, 241, 241, 241, 241, 241}, isOpaque = true}
+					{blockId = 1, name = "stone", textureIds = new[] {241, 241, 241, 241, 241, 241}, isOpaque = true, renderNeighbors = true}
 			},
 			{
 				2,
 				new BlockTypeConfig
-					{blockId = 2, name = "bedrock", textureIds = new[] {225, 225, 225, 225, 225, 225}, isOpaque = true}
+					{blockId = 2, name = "bedrock", textureIds = new[] {225, 225, 225, 225, 225, 225}, isOpaque = true, renderNeighbors = true}
 			},
 			{
 				3,
 				new BlockTypeConfig
-					{blockId = 3, name = "dirt", textureIds = new[] {242, 242, 242, 242, 242, 242}, isOpaque = true}
+					{blockId = 3, name = "dirt", textureIds = new[] {242, 242, 242, 242, 242, 242}, isOpaque = true, renderNeighbors = true}
 			},
 			{
 				4,
 				new BlockTypeConfig
-					{blockId = 4, name = "grass", textureIds = new[] {243, 243, 240, 242, 243, 243}, isOpaque = true}
+					{blockId = 4, name = "grass", textureIds = new[] {243, 243, 240, 242, 243, 243}, isOpaque = true, renderNeighbors = true}
 			},
 			{
 				5,
 				new BlockTypeConfig
-					{blockId = 5, name = "leaves", textureIds = new[] {196, 196, 196, 196, 196, 196}, isOpaque = false}
+					{blockId = 5, name = "leaves", textureIds = new[] {196, 196, 196, 196, 196, 196}, isOpaque = false, renderNeighbors = true}
 			},
 			{
 				6,
 				new BlockTypeConfig
-					{blockId = 6, name = "brick", textureIds = new[] {247, 247, 247, 247, 247, 247}, isOpaque = true}
+					{blockId = 6, name = "brick", textureIds = new[] {247, 247, 247, 247, 247, 247}, isOpaque = true, renderNeighbors = true}
 			},
 			{
 				7,
 				new BlockTypeConfig
-					{blockId = 7, name = "water", textureIds = new [] {61, 61, 61, 61, 61, 61}, isOpaque = true}
+					{blockId = 7, name = "water", textureIds = new [] {61, 61, 61, 61, 61, 61}, isOpaque = false, renderNeighbors = false}
 			},
 			{
 				8,
 				new BlockTypeConfig
-					{blockId = 8, name = "snow", textureIds = new [] {178, 178, 178, 178, 178, 178}, isOpaque = true}
+					{blockId = 8, name = "snow", textureIds = new [] {178, 178, 178, 178, 178, 178}, isOpaque = true, renderNeighbors = true}
 			},
 			{
 				9,
 				new BlockTypeConfig
-					{blockId = 9, name = "sand", textureIds = new [] {226, 226, 226, 226, 226, 226}, isOpaque = true}
+					{blockId = 9, name = "sand", textureIds = new [] {226, 226, 226, 226, 226, 226}, isOpaque = true, renderNeighbors = true}
 			}
 		};
 	}
