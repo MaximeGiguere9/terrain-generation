@@ -1,0 +1,75 @@
+{
+	"test":"asdasd",
+	"Blocks":[
+		{
+			"Id":1,
+			"Name":"stone",
+			"TextureIndexes":[241, 241, 241, 241, 241, 241],
+			"Transparent":false,
+			"HideConnectingFaces":false
+		},
+		{
+			"Id":2,
+			"Name":"bedrock",
+			"TextureIndexes":[225, 225, 225, 225, 225, 225],
+			"Transparent":false,
+			"HideConnectingFaces":false
+		},
+		{
+			"Id":3,
+			"Name":"dirt",
+			"TextureIndexes":[242, 242, 242, 242, 242, 242],
+			"Transparent":false,
+			"HideConnectingFaces":false
+		},
+		{
+			"Id":4,
+			"Name":"grass",
+			"TextureIndexes":[243, 243, 240, 242, 243, 243],
+			"Transparent":false,
+			"HideConnectingFaces":false
+		},
+		{
+			"Id":5,
+			"Name":"leaves",
+			"TextureIndexes":[196, 196, 196, 196, 196, 196],
+			"Transparent":true,
+			"HideConnectingFaces":false
+		},
+		{
+			"Id":6,
+			"Name":"brick",
+			"TextureIndexes":[247, 247, 247, 247, 247, 247],
+			"Transparent":false,
+			"HideConnectingFaces":false
+		},
+		{
+			"Id":7,
+			"Name":"water",
+			"TextureIndexes":[61, 61, 61, 61, 61, 61],
+			"Transparent":true,
+			"HideConnectingFaces":true
+		},
+		{
+			"Id":8,
+			"Name":"snow",
+			"TextureIndexes":[178, 178, 178, 178, 178, 178],
+			"Transparent":false,
+			"HideConnectingFaces":false
+		},
+		{
+			"Id":9,
+			"Name":"sand",
+			"TextureIndexes":[226, 226, 226, 226, 226, 226],
+			"Transparent":false,
+			"HideConnectingFaces":false
+		},
+		{
+			"Id":10,
+			"Name":"wood",
+			"TextureIndexes":[228, 228, 229, 229, 228, 228],
+			"Transparent":false,
+			"HideConnectingFaces":false
+		}
+	]
+}
