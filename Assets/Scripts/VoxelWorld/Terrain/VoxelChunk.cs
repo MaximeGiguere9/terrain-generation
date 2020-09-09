@@ -2,6 +2,7 @@
 using System.Linq;
 using UnityEngine;
 using VoxelWorld.Utils;
+using VoxelWorld2.Blocks;
 
 namespace VoxelWorld.Terrain
 {
@@ -13,6 +14,8 @@ namespace VoxelWorld.Terrain
 
 		[SerializeField] private MeshFilter meshFilter;
 		[SerializeField] private MeshCollider meshCollider;
+
+		private readonly BlockService blockService = new BlockService();
 
 		private byte[,,] blocks;
 
@@ -33,6 +36,7 @@ namespace VoxelWorld.Terrain
 		private void Awake()
 		{
 			this.blocks = new byte[ChunkSize, ChunkSize, ChunkSize];
+			this.blockService.LoadBlocks("blocks");
 		}
 
 		public void SetBlockAt(Vector3Int position, byte blockId)
@@ -73,23 +77,21 @@ namespace VoxelWorld.Terrain
 
 			CoordinateIterator itr = new CoordinateIterator(Vector3Int.one * ChunkSize, Vector3Int.zero);
 
+			var faces = BlockProperties.Faces;
+			var faceTris = BlockProperties.FaceTriangles;
+
 			foreach (Vector3Int pos in itr)
 			{
 				byte block = this.blocks[pos.x, pos.y, pos.z];
 				if (block == 0) continue;
 
-				for (int i = 0; i < VoxelBlock.Faces.Length; i++)
+				for (int i = 0; i < faces.Length; i++)
 				{
-					
-					bool isNeighborSameBlock = VoxelTerrain.ActiveTerrain.GetBlockAt(pos + this.position * ChunkSize + VoxelBlock.Faces[i]) == block;
-					bool isFaceVisible = VoxelBlock.IsFaceVisible(GetWorldPosition(pos), i) && (VoxelBlock.Blocks[block].renderNeighbors || !isNeighborSameBlock);
+					if (!blockService.IsFaceVisible(ref VoxelTerrain.ActiveTerrain, GetWorldPosition(pos), i)) continue;
 
-
-					if (!isFaceVisible) continue;
-
-					vertices.AddRange(VoxelBlock.GetFaceVertices(pos, i));
-					uvs.AddRange(VoxelBlock.GetFaceUVs(block, i));
-					triangles.AddRange(VoxelBlock.FaceTriangles.Select(id => vertices.Count - 1 - id));
+					vertices.AddRange(blockService.GetFaceVertices(pos, i));
+					uvs.AddRange(blockService.GetFaceUVs(block, i));
+					triangles.AddRange(faceTris.Select(id => vertices.Count - 1 - id));
 				}
 			}
 

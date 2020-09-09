@@ -1,11 +1,14 @@
 ﻿using System;
 using UnityEngine;
 using VoxelWorld.Terrain;
+using VoxelWorld2.Blocks;
 
 namespace VoxelWorld.Utils
 {
 	public class BlockTargeter
 	{
+		public static readonly Vector3 BlockSize = Vector3Int.one;
+		
 		public class HitPoint
 		{
 			public readonly Vector3Int Position;
@@ -71,7 +74,7 @@ namespace VoxelWorld.Utils
 		/// <returns></returns>
 		private static float GetDistanceToBlock(Vector3 origin, Vector3Int blockPosition)
 		{
-			return (blockPosition + VoxelBlock.Size / 2f - origin).magnitude;
+			return (blockPosition + BlockSize / 2f - origin).magnitude;
 		}
 
 		/// <summary>
@@ -83,7 +86,9 @@ namespace VoxelWorld.Utils
 		/// <returns>The normal of the face through which the ray exists the box, or null if the ray does not intersect the box</returns>
 		private static Vector3Int? FindRayBoxExitNormal(Vector3 rayOrigin, Vector3 rayDirection, Vector3Int blockPosition)
 		{
-			for (int i = 0; i < VoxelBlock.Faces.Length; i++)
+			var faces = BlockProperties.Faces;
+
+			for (int i = 0; i < faces.Length; i++)
 			{
 				//find intersection for individual face plane
 				Vector3? intersection = GetRayFaceIntersection(rayOrigin, rayDirection, blockPosition, i);
@@ -98,7 +103,7 @@ namespace VoxelWorld.Utils
 				if (result.x < 0 || result.x > 1 || result.y < 0 || result.y > 1)
 					continue;
 
-				Vector3Int faceNormal = VoxelBlock.Faces[i];
+				Vector3Int faceNormal = faces[i];
 
 				//if larger than 0, ray exits box, otherwise ray enters box
 				float colinearity = Vector3.Dot(rayDirection.normalized, faceNormal);
@@ -124,14 +129,17 @@ namespace VoxelWorld.Utils
 		/// <returns></returns>
 		private static Vector3? GetRayFaceIntersection(Vector3 rayOrigin, Vector3 rayDirection, Vector3Int blockPosition, int faceIndex)
 		{
+			var verts = BlockProperties.Vertices;
+			var faceVerts = BlockProperties.FaceVertices;
+
 			//face plane equation components
-			Vector3 u = VoxelBlock.Vertices[VoxelBlock.FaceVertices[faceIndex][1]] -
-			            VoxelBlock.Vertices[VoxelBlock.FaceVertices[faceIndex][0]];
+			Vector3 u = verts[faceVerts[faceIndex][1]] -
+			            verts[faceVerts[faceIndex][0]];
 
-			Vector3 v = VoxelBlock.Vertices[VoxelBlock.FaceVertices[faceIndex][2]] -
-			            VoxelBlock.Vertices[VoxelBlock.FaceVertices[faceIndex][1]];
+			Vector3 v = verts[faceVerts[faceIndex][2]] -
+			            verts[faceVerts[faceIndex][1]];
 
-			Vector3 p0 = VoxelBlock.Vertices[VoxelBlock.FaceVertices[faceIndex][0]] + blockPosition;
+			Vector3 p0 = verts[faceVerts[faceIndex][0]] + blockPosition;
 
 			//solving (x,y,z) intersection with linear algebra
 			//rayOrigin + t*dir = planeOrigin + x*u + y*v <=> x*u + y*v - t*dir = rayOrigin - planeOrigin
@@ -156,12 +164,15 @@ namespace VoxelWorld.Utils
 		/// <param name="color"></param>
 		private static void DrawBlockOutline(Vector3Int position, Color color)
 		{
-			foreach (byte[] vertexIndexes in VoxelBlock.FaceVertices)
+			var verts = BlockProperties.Vertices;
+			var faceVerts = BlockProperties.FaceVertices;
+
+			foreach (byte[] vertexIndexes in faceVerts)
 			{
 				for (int i = 0; i < vertexIndexes.Length - 1; i++)
 				{
-					Vector3 start = position + VoxelBlock.Vertices[vertexIndexes[i]];
-					Vector3 end = position + VoxelBlock.Vertices[vertexIndexes[i + 1]];
+					Vector3 start = position + verts[vertexIndexes[i]];
+					Vector3 end = position + verts[vertexIndexes[i + 1]];
 
 					Debug.DrawLine(start, end, color);
 				}
@@ -176,7 +187,7 @@ namespace VoxelWorld.Utils
 		/// <param name="color"></param>
 		private static void DrawBlockNormal(Vector3 position, Vector3 faceNormal, Color color)
 		{
-			Debug.DrawRay(position + VoxelBlock.Size / 2, faceNormal / 2, color);
+			Debug.DrawRay(position + BlockSize / 2, faceNormal / 2, color);
 		}
 
 	}
