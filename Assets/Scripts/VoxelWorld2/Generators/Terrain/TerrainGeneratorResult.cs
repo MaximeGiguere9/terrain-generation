@@ -21,7 +21,7 @@ namespace VoxelWorld2.Generators.Terrain
 
 		public Vector3Int GetSize() => this.size;
 
-		public byte? GetBlockAt(Vector3Int position)
+		public byte? GetBlockAt(in Vector3Int position)
 		{
 			int arrayIndex = GetArrayIndex(this.size, position);
 			if(arrayIndex < 0 || arrayIndex >= this.blocks.Length)
@@ -29,7 +29,7 @@ namespace VoxelWorld2.Generators.Terrain
 			return this.blocks[arrayIndex];
 		}
 
-		public void SetBlockAt(Vector3Int position, byte blockId)
+		public void SetBlockAt(in Vector3Int position, byte blockId)
 		{
 			int arrayIndex = GetArrayIndex(this.size, position);
 			if (arrayIndex < 0 || arrayIndex >= this.blocks.Length)

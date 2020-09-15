@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 using VoxelWorld.Terrain.Generators.Abstractions;
 using VoxelWorld.Utils;
-using Random = UnityEngine.Random;
+using VoxelWorld2.Generators.Common;
+using VoxelWorld2.Generators.Terrain;
 
 namespace VoxelWorld.Terrain.Generators
 {
@@ -26,7 +26,9 @@ namespace VoxelWorld.Terrain.Generators
 
 		public bool SupportsInfiniteGeneration() => true;
 
-		public void GenerateAll() => throw new NotSupportedException();
+		public void GenerateAll(out IBlockGeneratorResult result) => throw new NotSupportedException();
+
+		public void GenerateAllIntoExisting(ref IBlockGeneratorResult result) => throw new NotSupportedException();
 
 		public void Initialize()
 		{
@@ -59,29 +61,43 @@ namespace VoxelWorld.Terrain.Generators
 			this.plateauGenerator.Initialize();
 		}
 
-		public void Generate(int chunkX, int chunkZ)
+		public void Generate(int chunkX, int chunkZ, out IBlockGeneratorResult result)
 		{
 			Generate(new CoordinateIterator(
 				new Vector3Int(this.chunkSize, 1, this.chunkSize),
 				new Vector3Int(chunkX * this.chunkSize, 0, chunkZ * this.chunkSize)
-			));
+			), out result);
 		}
 
-		public void Generate(CoordinateIterator iterator)
+		public void Generate(CoordinateIterator iterator, out IBlockGeneratorResult result)
+		{
+			result = new TerrainGeneratorResult(iterator.offset, iterator.size);
+			GenerateIntoExisting(iterator, ref result);
+		}
+
+		public void GenerateIntoExisting(int chunkX, int chunkZ, ref IBlockGeneratorResult result)
+		{
+			GenerateIntoExisting(new CoordinateIterator(
+				new Vector3Int(this.chunkSize, 1, this.chunkSize),
+				new Vector3Int(chunkX * this.chunkSize, 0, chunkZ * this.chunkSize)
+			), ref result);
+		}
+
+		public void GenerateIntoExisting(CoordinateIterator iterator, ref IBlockGeneratorResult result)
 		{
 			foreach (Vector3Int pos in iterator)
 			{
 				float noise = Mathf.PerlinNoise(pos.x * this.biomeScale, pos.z * this.biomeScale);
 
 				CoordinateIterator itr = new CoordinateIterator(Vector3Int.one, pos);
-
+				
 				if (noise > 0.5f)
 				{
-					this.plateauGenerator.Generate(itr);
+					this.plateauGenerator.GenerateIntoExisting(itr, ref result);
 				}
 				else
 				{
-					this.plainsGenerator.Generate(itr);
+					this.plainsGenerator.GenerateIntoExisting(itr, ref result);
 				}
 			}
 		}

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using VoxelWorld.Terrain.Generators.Abstractions;
+using VoxelWorld.Utils;
+using VoxelWorld2.Generators.Common;
 
 namespace VoxelWorld.Terrain
 {
@@ -48,7 +50,12 @@ namespace VoxelWorld.Terrain
 
 			if (!this.terrainGenerator.SupportsInfiniteGeneration())
 			{
-				this.terrainGenerator.GenerateAll();
+				this.terrainGenerator.GenerateAll(out IBlockGeneratorResult result);
+				foreach (Vector3Int pos in new CoordinateIterator(result.GetSize(), result.GetOffset()))
+				{
+					byte? block = result.GetBlockAt(pos);
+					if (block.HasValue) ActiveTerrain.SetBlockAt(pos, block.Value);
+				}
 				foreach (VoxelChunk chunk in this.ChunkMap.Values) chunk.Loaded = true;
 				StartCoroutine(QueueRedrawAll());
 				return;
@@ -218,18 +225,23 @@ namespace VoxelWorld.Terrain
 		{
 			if (!this.terrainGenerator.SupportsInfiniteGeneration()) return;
 
-			foreach (Vector2Int pos in chunkPositions)
+			foreach (Vector2Int chunkPos in chunkPositions)
 			{
-				this.terrainGenerator.Generate(pos.x, pos.y);
+				this.terrainGenerator.Generate(chunkPos.x, chunkPos.y, out IBlockGeneratorResult result);
+				foreach (Vector3Int pos in new CoordinateIterator(result.GetSize(), result.GetOffset()))
+				{
+					byte? block = result.GetBlockAt(pos);
+					if (block.HasValue) ActiveTerrain.SetBlockAt(pos, block.Value);
+				}
 				IEnumerable<KeyValuePair<Vector3Int, VoxelChunk>> chunksToRedraw = this.ChunkMap.Where(kvp =>
-					kvp.Key.x >= pos.x - 1 &&
-					kvp.Key.x <= pos.x + 1 &&
-					kvp.Key.z >= pos.y - 1 &&
-					kvp.Key.z <= pos.y + 1
+					kvp.Key.x >= chunkPos.x - 1 &&
+					kvp.Key.x <= chunkPos.x + 1 &&
+					kvp.Key.z >= chunkPos.y - 1 &&
+					kvp.Key.z <= chunkPos.y + 1
 				);
 				foreach (KeyValuePair<Vector3Int, VoxelChunk> kvp in chunksToRedraw)
 				{
-					if (kvp.Key.x == pos.x && kvp.Key.z == pos.y)
+					if (kvp.Key.x == chunkPos.x && kvp.Key.z == chunkPos.y)
 					{
 						kvp.Value.Loaded = true;
 					}

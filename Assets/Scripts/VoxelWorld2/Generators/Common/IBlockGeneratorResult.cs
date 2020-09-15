@@ -24,6 +24,8 @@ namespace VoxelWorld2.Generators.Common
 		/// </summary>
 		/// <param name="position">Position of the block in the local coordinate system</param>
 		/// <returns></returns>
-		byte? GetBlockAt(Vector3Int position);
+		byte? GetBlockAt(in Vector3Int position);
+
+		void SetBlockAt(in Vector3Int position, byte blockId);
 	}
 }

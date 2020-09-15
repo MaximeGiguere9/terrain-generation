@@ -48,7 +48,7 @@ namespace VoxelWorld2.Generators.Structures
 		public Vector3Int GetSize() =>
 			new Vector3Int(LEAVES_RADIUS * 2 + 1, this.height + LEAVES_RADIUS, LEAVES_RADIUS * 2 + 1);
 
-		public byte? GetBlockAt(Vector3Int position)
+		public byte? GetBlockAt(in Vector3Int position)
 		{
 			if (position.x < 0 || position.y < 0 || position.z < 0)
 				throw new ArgumentOutOfRangeException(nameof(position));
@@ -60,6 +60,11 @@ namespace VoxelWorld2.Generators.Structures
 				return this.leaves[position];
 
 			return null;
+		}
+
+		public void SetBlockAt(in Vector3Int position, byte blockId)
+		{
+			throw new NotSupportedException();
 		}
 	}
 }

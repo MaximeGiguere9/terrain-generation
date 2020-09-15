@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using VoxelWorld.Terrain.Generators.Abstractions;
 using VoxelWorld.Utils;
+using VoxelWorld2.Generators.Common;
+using VoxelWorld2.Generators.Terrain;
 
 namespace VoxelWorld.Terrain.Generators
 {
@@ -21,7 +23,12 @@ namespace VoxelWorld.Terrain.Generators
 
 		public bool SupportsInfiniteGeneration() => true;
 
-		public void GenerateAll()
+		public void GenerateAll(out IBlockGeneratorResult result)
+		{
+			throw new NotSupportedException();
+		}
+
+		public void GenerateAllIntoExisting(ref IBlockGeneratorResult result)
 		{
 			throw new NotSupportedException();
 		}
@@ -55,15 +62,29 @@ namespace VoxelWorld.Terrain.Generators
 		/// </summary>
 		/// <param name="chunkX"></param>
 		/// <param name="chunkZ"></param>
-		public void Generate(int chunkX, int chunkZ)
+		public void Generate(int chunkX, int chunkZ, out IBlockGeneratorResult result)
 		{
 			Generate(new CoordinateIterator(
 				new Vector3Int(this.chunkSize, 1, this.chunkSize),
 				new Vector3Int(chunkX * this.chunkSize, 0, chunkZ * this.chunkSize)
-			));
+			), out result);
 		}
 
-		public void Generate(CoordinateIterator iterator)
+		public void Generate(CoordinateIterator iterator, out IBlockGeneratorResult result)
+		{
+			result = new TerrainGeneratorResult(iterator.offset, iterator.size);
+			GenerateIntoExisting(iterator, ref result);
+		}
+
+		public void GenerateIntoExisting(int chunkX, int chunkZ, ref IBlockGeneratorResult result)
+		{
+			GenerateIntoExisting(new CoordinateIterator(
+				new Vector3Int(this.chunkSize, 1, this.chunkSize),
+				new Vector3Int(chunkX * this.chunkSize, 0, chunkZ * this.chunkSize)
+			), ref result);
+		}
+
+		public void GenerateIntoExisting(CoordinateIterator iterator, ref IBlockGeneratorResult result)
 		{
 			Dictionary<Tuple<int, int>, float> noiseMap = new Dictionary<Tuple<int, int>, float>();
 
@@ -109,12 +130,12 @@ namespace VoxelWorld.Terrain.Generators
 					else if (y > height - 5) blockId = 9;
 					else blockId = 1;
 
-					VoxelTerrain.ActiveTerrain.SetBlockAt(new Vector3Int(x, y, z), blockId);
+					result.SetBlockAt(new Vector3Int(x, y, z), blockId);
 				}
 
 				for (int y = height; y < VoxelSettings.Instance.WaterLevel; y++)
 				{
-					VoxelTerrain.ActiveTerrain.SetBlockAt(new Vector3Int(x, y, z), 7);
+					result.SetBlockAt(new Vector3Int(x, y, z), 7);
 				}
 
 			}

@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using VoxelWorld.Terrain.Generators.Abstractions;
 using VoxelWorld.Utils;
+using VoxelWorld2.Generators.Common;
+using VoxelWorld2.Generators.Terrain;
 
 namespace VoxelWorld.Terrain.Generators
 {
@@ -10,7 +12,14 @@ namespace VoxelWorld.Terrain.Generators
 
 		public bool SupportsInfiniteGeneration() => false;
 
-		public void GenerateAll()
+		public void GenerateAll(out IBlockGeneratorResult result)
+		{
+			Vector3Int size = VoxelSettings.Instance.WorldSize;
+			result = new TerrainGeneratorResult(Vector3Int.zero, size);
+			GenerateAllIntoExisting(ref result);
+		}
+
+		public void GenerateAllIntoExisting(ref IBlockGeneratorResult result)
 		{
 			int seed = VoxelSettings.Instance.Seed;
 			int octaves = VoxelSettings.Instance.Octaves;
@@ -90,7 +99,7 @@ namespace VoxelWorld.Terrain.Generators
 					else if (y > height - 5) blockId = 3;
 					else blockId = 1;
 
-					VoxelTerrain.ActiveTerrain.SetBlockAt(new Vector3Int(x, y, z), blockId);
+					result.SetBlockAt(new Vector3Int(x, y, z), blockId);
 				}
 
 			}
@@ -101,12 +110,22 @@ namespace VoxelWorld.Terrain.Generators
 			throw new System.NotSupportedException();
 		}
 
-		public void Generate(int chunkX, int chunkZ)
+		public void Generate(int chunkX, int chunkZ, out IBlockGeneratorResult result)
 		{
 			throw new System.NotSupportedException();
 		}
 
-		public void Generate(CoordinateIterator iterator)
+		public void Generate(CoordinateIterator iterator, out IBlockGeneratorResult result)
+		{
+			throw new System.NotSupportedException();
+		}
+
+		public void GenerateIntoExisting(int chunkX, int chunkZ, ref IBlockGeneratorResult result)
+		{
+			throw new System.NotSupportedException();
+		}
+
+		public void GenerateIntoExisting(CoordinateIterator iterator, ref IBlockGeneratorResult result)
 		{
 			throw new System.NotSupportedException();
 		}
