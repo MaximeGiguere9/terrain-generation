@@ -8,13 +8,15 @@ namespace VoxelWorld2.Blocks
 {
 	public class BlockService
 	{
-		private Dictionary<byte, BlockModel> blocks;
+		private static Dictionary<byte, BlockModel> _blocks;
 
 		public void LoadBlocks(string path)
 		{
+			if (_blocks != null) return;
+
 			TextAsset res = Resources.Load(path) as TextAsset;
 			BlocksConfig config = JsonUtility.FromJson<BlocksConfig>(res.text);
-			this.blocks = config.Blocks.ToDictionary(b => b.Id, b => b);
+			_blocks = config.Blocks.ToDictionary(b => b.Id, b => b);
 		}
 
 		/// <summary>
@@ -45,7 +47,7 @@ namespace VoxelWorld2.Blocks
 		/// <returns></returns>
 		public Vector2[] GetFaceUVs(byte blockId, int faceIndex)
 		{
-			int ti = this.blocks[blockId].TextureIndexes[faceIndex];
+			int ti = _blocks[blockId].TextureIndexes[faceIndex];
 			int x = ti % 16;
 			int y = ti / 16;
 			return new[]
@@ -64,7 +66,7 @@ namespace VoxelWorld2.Blocks
 		/// <returns></returns>
 		public bool IsTransparent(byte blockId)
 		{
-			return !this.blocks.TryGetValue(blockId, out BlockModel value) || value.Transparent;
+			return !_blocks.TryGetValue(blockId, out BlockModel value) || value.Transparent;
 		}
 
 		/// <summary>
@@ -79,7 +81,12 @@ namespace VoxelWorld2.Blocks
 			Vector3Int neighborPos = position + BlockProperties.Faces[faceIndex];
 			byte block = terrain.GetBlockAt(position);
 			byte neighbor = terrain.GetBlockAt(neighborPos);
-			return this.IsTransparent(terrain.GetBlockAt(neighborPos)) && !(this.blocks[block].HideConnectingFaces && block == neighbor);
+			return this.IsTransparent(neighbor) && !(_blocks[block].HideConnectingFaces && block == neighbor);
+		}
+
+		public bool IsFaceVisible(byte block, byte neighbor)
+		{
+			return this.IsTransparent(neighbor) && !(_blocks[block].HideConnectingFaces && block == neighbor);
 		}
 	}
 }

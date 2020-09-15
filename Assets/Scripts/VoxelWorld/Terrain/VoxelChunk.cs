@@ -10,7 +10,7 @@ namespace VoxelWorld.Terrain
 	{
 		public static bool DebugMode { get; set; } = false;
 
-		private static int ChunkSize => VoxelSettings.Instance.ChunkSize;
+		private static int ChunkSize;
 
 		[SerializeField] private MeshFilter meshFilter;
 		[SerializeField] private MeshCollider meshCollider;
@@ -35,6 +35,7 @@ namespace VoxelWorld.Terrain
 
 		private void Awake()
 		{
+			ChunkSize = VoxelSettings.Instance.ChunkSize;
 			this.blocks = new byte[ChunkSize, ChunkSize, ChunkSize];
 			this.blockService.LoadBlocks("blocks");
 		}
@@ -87,7 +88,18 @@ namespace VoxelWorld.Terrain
 
 				for (int i = 0; i < faces.Length; i++)
 				{
-					if (!blockService.IsFaceVisible(ref VoxelTerrain.ActiveTerrain, GetWorldPosition(pos), i)) continue;
+					if (pos.x > 0 && pos.x < ChunkSize - 1 && pos.y > 0 && pos.y < ChunkSize - 1 && pos.z > 0 &&
+					    pos.z < ChunkSize - 1)
+					{
+						Vector3Int neighborPos = pos + faces[i];
+						if (!blockService.IsFaceVisible(this.blocks[pos.x, pos.y, pos.z],  this.blocks[neighborPos.x, neighborPos.y, neighborPos.z])) continue;
+					}
+					else
+					{
+						if (!blockService.IsFaceVisible(ref VoxelTerrain.ActiveTerrain, GetWorldPosition(pos), i)) continue;
+					}
+
+					
 
 					vertices.AddRange(blockService.GetFaceVertices(pos, i));
 					uvs.AddRange(blockService.GetFaceUVs(block, i));

@@ -128,7 +128,7 @@ namespace VoxelWorld.Terrain.Generators
 
 				if ((pos.x + this.chunkSize / 2) % this.chunkSize != 0 || (pos.z + this.chunkSize / 2) % this.chunkSize != 0 || height < VoxelSettings.Instance.WaterLevel) continue;
 
-				IBlockGeneratorResult tree = new TreeStructure().Generate(pos);
+				new TreeStructure().Generate(pos, out IBlockGeneratorResult tree);
 				foreach (Vector3Int treeBlockPos in new CoordinateIterator(tree.GetSize(), Vector3Int.zero))
 				{
 					byte? treeBlock = tree.GetBlockAt(treeBlockPos);

@@ -4,6 +4,6 @@ namespace VoxelWorld2.Generators.Common
 {
 	public interface IBlockGenerator
 	{
-		IBlockGeneratorResult Generate(Vector3Int offset);
+		void Generate(Vector3Int offset, out IBlockGeneratorResult result);
 	}
 }

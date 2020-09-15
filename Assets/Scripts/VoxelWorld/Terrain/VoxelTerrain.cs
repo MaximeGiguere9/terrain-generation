@@ -11,8 +11,8 @@ namespace VoxelWorld.Terrain
 		public static VoxelTerrain ActiveTerrain;
 		private static void SetActiveTerrain(VoxelTerrain world) => ActiveTerrain = world; 
 
-		private static GameObject ChunkPrefab => VoxelSettings.Instance.ChunkPrefab;
-		private static int ChunkSize => VoxelSettings.Instance.ChunkSize;
+		private static GameObject ChunkPrefab;
+		private static int ChunkSize;
 
 		[SerializeField] private TerrainGeneratorType terrainGeneratorType;
 
@@ -38,6 +38,8 @@ namespace VoxelWorld.Terrain
 		private void Awake()
 		{
 			SetActiveTerrain(this);
+			ChunkSize = VoxelSettings.Instance.ChunkSize;
+			ChunkPrefab = VoxelSettings.Instance.ChunkPrefab;
 		}
 
 		private void Start()
@@ -142,7 +144,7 @@ namespace VoxelWorld.Terrain
 		{
 			Vector3Int chunkPosition = GetContainingChunkPosition(position);
 
-			VoxelChunk chunk = GetChunkAt(chunkPosition);
+			ChunkMap.TryGetValue(chunkPosition, out VoxelChunk chunk);
 
 			if (chunk == null) chunk = CreateChunk(chunkPosition);
 			chunk.SetBlockAt(position, blockId);
@@ -156,7 +158,7 @@ namespace VoxelWorld.Terrain
 		{
 			Vector3Int chunkPosition = GetContainingChunkPosition(position);
 
-			VoxelChunk chunk = GetChunkAt(chunkPosition);
+			ChunkMap.TryGetValue(chunkPosition, out VoxelChunk chunk);
 			return chunk == null ? (byte) 0 : chunk.GetBlockAt(position);
 		}
 
@@ -164,7 +166,7 @@ namespace VoxelWorld.Terrain
 		{
 			Vector3Int chunkPosition = GetContainingChunkPosition(position);
 
-			VoxelChunk chunk = GetChunkAt(chunkPosition);
+			ChunkMap.TryGetValue(chunkPosition, out VoxelChunk chunk);
 			if (chunk == null) return 0;
 
 			byte removedBlock = chunk.RemoveBlockAt(position);
@@ -180,7 +182,8 @@ namespace VoxelWorld.Terrain
 			foreach (Vector3Int offset in Neighbors)
 			{
 				Vector3Int chunkPosition = GetContainingChunkPosition(position + offset);
-				Redraw(GetChunkAt(chunkPosition));
+				ChunkMap.TryGetValue(chunkPosition, out VoxelChunk chunk);
+				Redraw(chunk);
 			}
 		}
 
@@ -200,12 +203,6 @@ namespace VoxelWorld.Terrain
 		public void RegisterChunk(VoxelChunk chunk)
 		{
 			ChunkMap.Add(chunk.Position, chunk);
-		}
-
-		public VoxelChunk GetChunkAt(Vector3Int position)
-		{
-			ChunkMap.TryGetValue(position, out VoxelChunk chunk);
-			return chunk;
 		}
 
 		public Vector3Int GetContainingChunkPosition(Vector3Int position)
