@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using VoxelWorld.Terrain.Generators.Abstractions;
 using VoxelWorld.Utils;
+using VoxelWorld2.Generators.Common;
+using VoxelWorld2.Generators.Structures;
 
 namespace VoxelWorld.Terrain.Generators
 {
@@ -127,11 +128,12 @@ namespace VoxelWorld.Terrain.Generators
 
 				if ((pos.x + this.chunkSize / 2) % this.chunkSize != 0 || (pos.z + this.chunkSize / 2) % this.chunkSize != 0 || height < VoxelSettings.Instance.WaterLevel) continue;
 
-				var tree = TreeStructure.Generate();
-
-				foreach (var kvp in tree.Where(kvp => VoxelTerrain.ActiveTerrain.GetBlockAt(kvp.Key) == 0))
+				IBlockGeneratorResult tree = new TreeStructure().Generate(pos);
+				foreach (Vector3Int treeBlockPos in new CoordinateIterator(tree.GetSize(), Vector3Int.zero))
 				{
-					VoxelTerrain.ActiveTerrain.SetBlockAt(kvp.Key + new Vector3Int(pos.x, height, pos.z), kvp.Value);
+					byte? treeBlock = tree.GetBlockAt(treeBlockPos);
+					if(treeBlock.HasValue)
+						VoxelTerrain.ActiveTerrain.SetBlockAt(treeBlockPos + new Vector3Int(pos.x, height - 1, pos.z), treeBlock.Value);
 				}
 			}
 		}
