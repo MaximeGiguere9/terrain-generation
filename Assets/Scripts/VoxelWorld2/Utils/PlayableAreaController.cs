@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using VoxelWorld.Terrain;
 
-namespace VoxelWorld.Utils
+namespace VoxelWorld2.Utils
 {
 	public class PlayableAreaController : MonoBehaviour
 	{

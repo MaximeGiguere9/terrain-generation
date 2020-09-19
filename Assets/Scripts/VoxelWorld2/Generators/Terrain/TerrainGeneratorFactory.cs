@@ -1,6 +1,7 @@
 ﻿using System;
+using VoxelWorld2.Generators.Terrain.Impl;
 
-namespace VoxelWorld.Terrain.Generators.Abstractions
+namespace VoxelWorld2.Generators.Terrain
 {
 	public class TerrainGeneratorFactory
 	{

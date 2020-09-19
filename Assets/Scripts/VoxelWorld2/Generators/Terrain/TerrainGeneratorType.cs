@@ -1,4 +1,4 @@
-﻿namespace VoxelWorld.Terrain.Generators.Abstractions
+﻿namespace VoxelWorld2.Generators.Terrain
 {
 	public enum TerrainGeneratorType
 	{

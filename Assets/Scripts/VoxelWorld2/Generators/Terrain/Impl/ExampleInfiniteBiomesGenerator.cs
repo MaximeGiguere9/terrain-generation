@@ -1,11 +1,10 @@
 ﻿using System;
 using UnityEngine;
-using VoxelWorld.Terrain.Generators.Abstractions;
-using VoxelWorld.Utils;
+using VoxelWorld.Terrain;
 using VoxelWorld2.Generators.Common;
-using VoxelWorld2.Generators.Terrain;
+using VoxelWorld2.Utils;
 
-namespace VoxelWorld.Terrain.Generators
+namespace VoxelWorld2.Generators.Terrain.Impl
 {
 	public class ExampleInfiniteBiomesGenerator : ITerrainGenerator
 	{

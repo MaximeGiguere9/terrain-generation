@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VoxelWorld.Terrain
+namespace VoxelWorld2.Utils
 {
 	[CreateAssetMenu(fileName = "VoxelSettings", menuName = "Game Settings/Voxel World Settings", order = 100)]
 	public class VoxelSettings : ScriptableObject

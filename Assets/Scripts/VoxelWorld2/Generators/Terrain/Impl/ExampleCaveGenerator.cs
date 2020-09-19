@@ -1,14 +1,13 @@
 ﻿using UnityEngine;
-using VoxelWorld.Terrain.Generators.Abstractions;
-using VoxelWorld.Utils;
+using VoxelWorld.Terrain;
 using VoxelWorld2.Generators.Common;
-using VoxelWorld2.Generators.Terrain;
+using VoxelWorld2.Utils;
 
-namespace VoxelWorld.Terrain.Generators
+namespace VoxelWorld2.Generators.Terrain.Impl
 {
-	public class ExampleTerrainGenerator : ITerrainGenerator
+	public class ExampleCaveGenerator : ITerrainGenerator
 	{
-		private float[,] noiseMap;
+		private float[,,] noiseMap;
 
 		public bool SupportsInfiniteGeneration() => false;
 
@@ -28,25 +27,20 @@ namespace VoxelWorld.Terrain.Generators
 			float scale = VoxelSettings.Instance.Scale;
 			float persistence = VoxelSettings.Instance.Persistence;
 			float lacunarity = VoxelSettings.Instance.Lacunarity;
+			AnimationCurve density = VoxelSettings.Instance.Density;
+
 
 			System.Random rng = new System.Random(seed);
-
 			Vector3[] octaveOffsets = new Vector3[octaves];
 			for (int i = 0; i < octaves; i++)
-			{
-				octaveOffsets[i] = new Vector3(
-					rng.Next(-100000, 100000) + offset.x,
-					rng.Next(-100000, 100000) + offset.y,
-					rng.Next(-100000, 100000) + offset.z
-				);
-			}
-			
+				octaveOffsets[i] = new Vector3(rng.Next(-100000, 100000) + offset.x, rng.Next(-100000, 100000) + offset.y, rng.Next(-100000, 100000) + offset.z);
+
 			float minValue = float.MaxValue;
 			float maxValue = float.MinValue;
 
-			this.noiseMap = new float[size.x, size.z];
+			this.noiseMap = new float[size.x, size.y, size.z];
 
-			CoordinateIterator iterator = new CoordinateIterator(new Vector3Int(size.x, 1, size.z), Vector3Int.zero);
+			CoordinateIterator iterator = new CoordinateIterator(size, Vector3Int.zero);
 
 			foreach (Vector3Int pos in iterator)
 			{
@@ -58,7 +52,7 @@ namespace VoxelWorld.Terrain.Generators
 				{
 					Vector3 samplePos = (Vector3)pos * scale * frequency + octaveOffsets[i];
 
-					float val = Mathf.PerlinNoise(samplePos.x, samplePos.z) * 2 - 1;
+					float val = PerlinSample3D(samplePos.x, samplePos.y, samplePos.z) * 2 - 1;
 					noise += val * amplitude;
 
 					amplitude *= persistence;
@@ -71,7 +65,7 @@ namespace VoxelWorld.Terrain.Generators
 				if (noise > maxValue)
 					maxValue = noise;
 
-				this.noiseMap[pos.x, pos.z] = noise;
+				this.noiseMap[pos.x, pos.y, pos.z] = noise;
 			}
 
 			iterator.Reset();
@@ -79,30 +73,27 @@ namespace VoxelWorld.Terrain.Generators
 			foreach (Vector3Int pos in iterator)
 			{
 				int x = pos.x;
+				int y = pos.y;
 				int z = pos.z;
 
-				this.noiseMap[x, z] = Mathf.InverseLerp(minValue, maxValue, this.noiseMap[x, z]);
+				this.noiseMap[x, y, z] = Mathf.InverseLerp(minValue, maxValue, this.noiseMap[x, y, z]);
+				if (this.noiseMap[x, y, z] > density.Evaluate((float)y / size.y)) continue;
 
-				float varianceMult = this.noiseMap[x, z];
-
-				float variance = size.y * varianceMult;
-
-				int height = Mathf.FloorToInt((this.noiseMap[x, z] * 2 - 1) * variance + Mathf.Max(size.y - variance, 0));
-
-				for (int y = 0; y < height; y++)
-				{
-					byte blockId;
-
-					if (y == 0) blockId = 2;
-					else if (y == height - 1) blockId = 5;
-					else if (y == height - 2) blockId = 4;
-					else if (y > height - 5) blockId = 3;
-					else blockId = 1;
-
-					result.SetBlockAt(new Vector3Int(x, y, z), blockId);
-				}
-
+				result.SetBlockAt(in pos, 1);
 			}
+		}
+
+		public float PerlinSample3D(float x, float y, float z)
+		{
+			float AB = Mathf.PerlinNoise(x, y);
+			float BC = Mathf.PerlinNoise(y, z);
+			float AC = Mathf.PerlinNoise(x, z);
+			float BA = Mathf.PerlinNoise(y, x);
+			float CB = Mathf.PerlinNoise(z, y);
+			float CA = Mathf.PerlinNoise(z, x);
+
+			float ABC = AB + BC + AC + BA + CB + CA;
+			return ABC / 6f;
 		}
 
 		public void Initialize()

@@ -3,7 +3,7 @@ using UnityEngine;
 using VoxelWorld.Terrain;
 using VoxelWorld2.Blocks;
 
-namespace VoxelWorld.Utils
+namespace VoxelWorld2.Utils
 {
 	public class BlockTargeter
 	{
@@ -23,7 +23,7 @@ namespace VoxelWorld.Utils
 
 		public static bool DebugMode { get; set; } = false;
 
-		public static HitPoint Target(Vector3 position, Vector3 direction, float maxDistance)
+		public static HitPoint Target(VoxelTerrain terrain, Vector3 position, Vector3 direction, float maxDistance)
 		{
 			/*
 			 * March through a series of ray-box intersections to find the closest block that can be targeted.
@@ -50,7 +50,7 @@ namespace VoxelWorld.Utils
 				Vector3Int exitFace = faceNormal.Value;
 				blockPosition += exitFace;
 
-				byte blockId = VoxelTerrain.ActiveTerrain.GetBlockAt(blockPosition);
+				byte blockId = terrain.GetBlockAt(blockPosition);
 
 				//block is empty
 				if (blockId <= 0)

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VoxelWorld.Utils;
 using VoxelWorld2.Generators.Common;
+using VoxelWorld2.Utils;
 
 namespace VoxelWorld2.Generators.Structures
 {

@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using VoxelWorld.Terrain;
-using VoxelWorld.Utils;
 
-namespace VoxelWorld.Actors
+namespace VoxelWorld2.Utils
 {
 	public class FirstPersonController : MonoBehaviour
 	{
@@ -58,7 +57,7 @@ namespace VoxelWorld.Actors
 		private void Target()
 		{
 			BlockTargeter.HitPoint targetHit =
-				BlockTargeter.Target(this.cameraTransform.position, this.cameraTransform.forward, this.maxTargetRange);
+				BlockTargeter.Target(VoxelTerrain.ActiveTerrain, this.cameraTransform.position, this.cameraTransform.forward, this.maxTargetRange);
 			
 			if (targetHit == null) return;
 

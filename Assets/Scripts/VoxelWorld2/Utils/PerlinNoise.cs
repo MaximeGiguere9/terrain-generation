@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VoxelWorld.Utils
+namespace VoxelWorld2.Utils
 {
 	public class PerlinNoise
 	{
