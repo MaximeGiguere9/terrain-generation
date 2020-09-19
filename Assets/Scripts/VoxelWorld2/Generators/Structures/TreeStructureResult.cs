@@ -10,18 +10,20 @@ namespace VoxelWorld2.Generators.Structures
 	{
 		private const int LEAVES_RADIUS = 2;
 
-		private readonly Vector3Int position;
 		private readonly int height;
-		private readonly Dictionary<Vector3Int, byte> leaves;
+		private readonly Vector3Int offset;
+		private readonly Vector3Int size;
+		private readonly Dictionary<Vector3Int, byte> blocks;
 
 		public TreeStructureResult(Vector3Int position, int height)
 		{
-			this.position = position;
 			this.height = height;
-			this.leaves = GenerateLeavesPattern();
+			this.offset = position - new Vector3Int(LEAVES_RADIUS, 0, LEAVES_RADIUS);
+			this.size = new Vector3Int(LEAVES_RADIUS * 2 + 1, this.height + LEAVES_RADIUS, LEAVES_RADIUS * 2 + 1);
+			this.blocks = GenerateStructure();
 		}
 
-		public Dictionary<Vector3Int, byte> GenerateLeavesPattern()
+		public Dictionary<Vector3Int, byte> GenerateStructure()
 		{
 			Dictionary<Vector3Int, byte> result = new Dictionary<Vector3Int, byte>();
 
@@ -34,32 +36,31 @@ namespace VoxelWorld2.Generators.Structures
 
 			foreach (Vector3Int pos in new CoordinateIterator(
 				new Vector3Int(LEAVES_RADIUS + 1, 1, LEAVES_RADIUS + 1), 
-				new Vector3Int(LEAVES_RADIUS/2, this.height, LEAVES_RADIUS / 2)
+				new Vector3Int(LEAVES_RADIUS / 2, this.height, LEAVES_RADIUS / 2)
 				)
 			)
 				result[pos] = 5;
 
+			foreach (Vector3Int pos in new CoordinateIterator(
+				new Vector3Int(1, this.height + LEAVES_RADIUS, 1),
+				new Vector3Int(LEAVES_RADIUS, 0, LEAVES_RADIUS)
+				)
+			)
+				result[pos] = pos.y < this.height ? (byte) 10 : (byte) 5;
+
 			return result;
 		}
 
-		public Vector3Int GetOffset() => 
-			this.position - new Vector3Int(LEAVES_RADIUS, 0, LEAVES_RADIUS);
+		public Vector3Int GetOffset() => this.offset;
 
-		public Vector3Int GetSize() =>
-			new Vector3Int(LEAVES_RADIUS * 2 + 1, this.height + LEAVES_RADIUS, LEAVES_RADIUS * 2 + 1);
+		public Vector3Int GetSize() => this.size;
 
 		public byte? GetBlockAt(in Vector3Int position)
 		{
 			if (position.x < 0 || position.y < 0 || position.z < 0)
 				throw new ArgumentOutOfRangeException(nameof(position));
 
-			if (position.x == LEAVES_RADIUS && position.z == LEAVES_RADIUS)
-				return position.y < this.height ? (byte) 10 : (byte) 5;
-
-			if (this.leaves.ContainsKey(position))
-				return this.leaves[position];
-
-			return null;
+			return this.blocks.TryGetValue(position, out byte block) ? block : (byte?) null;
 		}
 
 		public void SetBlockAt(in Vector3Int position, byte blockId)
