@@ -20,6 +20,7 @@ namespace VoxelWorld.Terrain.Generators
 		private Vector3[] octaveOffsets;
 		private int chunkSize;
 		private int baselineHeight;
+		private int waterLevel;
 
 		public bool SupportsInfiniteGeneration() => true;
 
@@ -43,6 +44,7 @@ namespace VoxelWorld.Terrain.Generators
 			this.lacunarity = VoxelSettings.Instance.Lacunarity;
 			this.chunkSize = VoxelSettings.Instance.ChunkSize;
 			this.baselineHeight = VoxelSettings.Instance.BaselineHeight;
+			this.waterLevel = VoxelSettings.Instance.WaterLevel;
 
 			this.rng = new System.Random(seed);
 
@@ -110,6 +112,10 @@ namespace VoxelWorld.Terrain.Generators
 
 			iterator.Reset();
 
+			int maxHeight = this.waterLevel;
+
+			HashSet<Vector3Int> heightMap = new HashSet<Vector3Int>();
+
 			foreach (Vector3Int pos in iterator)
 			{
 				int x = pos.x;
@@ -122,6 +128,23 @@ namespace VoxelWorld.Terrain.Generators
 
 				int height = Mathf.FloorToInt((noiseMap[key] * 2 - 1) * variance + Mathf.Max(this.baselineHeight - variance, 0));
 
+				heightMap.Add(new Vector3Int(x, height, z));
+				if (height > maxHeight) maxHeight = height;
+			}
+
+			if (result.GetSize().y < maxHeight)
+			{
+				Vector3Int res = result.GetSize();
+				res.y = maxHeight;
+				result.Resize(res);
+			}
+
+			foreach (Vector3Int pos in heightMap)
+			{
+				int x = pos.x - result.GetOffset().x;
+				int z = pos.z - result.GetOffset().z;
+				int height = pos.y - result.GetOffset().y;
+
 				for (int y = 0; y < height; y++)
 				{
 					byte blockId;
@@ -133,7 +156,7 @@ namespace VoxelWorld.Terrain.Generators
 					result.SetBlockAt(new Vector3Int(x, y, z), blockId);
 				}
 
-				for (int y = height; y < VoxelSettings.Instance.WaterLevel; y++)
+				for (int y = height; y < this.waterLevel; y++)
 				{
 					result.SetBlockAt(new Vector3Int(x, y, z), 7);
 				}

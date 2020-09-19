@@ -107,6 +107,11 @@ namespace VoxelWorld.Terrain.Generators
 
 			iterator.Reset();
 
+
+			int maxHeight = this.waterLevel;
+
+			HashSet<Vector3Int> heightMap = new HashSet<Vector3Int>();
+
 			foreach (Vector3Int pos in iterator)
 			{
 				int x = pos.x;
@@ -118,6 +123,23 @@ namespace VoxelWorld.Terrain.Generators
 				float variance = this.baselineHeight * varianceMult;
 
 				int height = Mathf.FloorToInt((noiseMap[key] * 2 - 1) * variance + Mathf.Max(this.baselineHeight - variance, 0));
+
+				heightMap.Add(new Vector3Int(x, height, z));
+				if (height > maxHeight) maxHeight = height;
+			}
+
+			if (result.GetSize().y < maxHeight)
+			{
+				Vector3Int res = result.GetSize();
+				res.y = maxHeight;
+				result.Resize(res);
+			}
+
+			foreach (Vector3Int pos in heightMap)
+			{
+				int x = pos.x - result.GetOffset().x;
+				int z = pos.z - result.GetOffset().z;
+				int height = pos.y - result.GetOffset().y;
 
 				for (int y = 0; y < height; y++)
 				{
@@ -137,7 +159,7 @@ namespace VoxelWorld.Terrain.Generators
 						else blockId = 1;
 					}
 
-					result.SetBlockAt(new Vector3Int(x, y, z) - iterator.offset, blockId);
+					result.SetBlockAt(new Vector3Int(x, y, z), blockId);
 				}
 
 				for (int y = height; y < this.waterLevel; y++)
@@ -146,13 +168,23 @@ namespace VoxelWorld.Terrain.Generators
 				}
 
 				if ((pos.x + this.chunkSize / 2) % this.chunkSize != 0 || (pos.z + this.chunkSize / 2) % this.chunkSize != 0 || height < this.waterLevel) continue;
-
+				
 				new TreeStructure().Generate(pos, out IBlockGeneratorResult tree);
-				foreach (Vector3Int treeBlockPos in new CoordinateIterator(tree.GetSize(), Vector3Int.zero))
+
+				int treeTerrainHeight = tree.GetOffset().y + tree.GetSize().y;
+				if (treeTerrainHeight > result.GetSize().y)
+				{
+					Vector3Int res = result.GetSize();
+					res.y = treeTerrainHeight;
+					result.Resize(res);
+				}
+
+				CoordinateIterator treeIterator = new CoordinateIterator(tree.GetSize(), Vector3Int.zero);
+				foreach (Vector3Int treeBlockPos in treeIterator)
 				{
 					byte? treeBlock = tree.GetBlockAt(treeBlockPos);
 					if(treeBlock.HasValue)
-						result.SetBlockAt(treeBlockPos + new Vector3Int(pos.x, height - 1, pos.z), treeBlock.Value);
+						result.SetBlockAt(tree.GetOffset() + treeBlockPos - result.GetOffset(), treeBlock.Value);
 				}
 			}
 		}

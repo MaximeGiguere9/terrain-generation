@@ -228,10 +228,10 @@ namespace VoxelWorld.Terrain
 			foreach (Vector2Int chunkPos in chunkPositions)
 			{
 				this.terrainGenerator.Generate(chunkPos.x, chunkPos.y, out IBlockGeneratorResult result);
-				foreach (Vector3Int pos in new CoordinateIterator(result.GetSize(), result.GetOffset()))
+				foreach (Vector3Int pos in new CoordinateIterator(result.GetSize(), Vector3Int.zero))
 				{
 					byte? block = result.GetBlockAt(pos);
-					if (block.HasValue) ActiveTerrain.SetBlockAt(pos, block.Value);
+					if (block.HasValue) ActiveTerrain.SetBlockAt(pos + result.GetOffset(), block.Value);
 				}
 				IEnumerable<KeyValuePair<Vector3Int, VoxelChunk>> chunksToRedraw = this.ChunkMap.Where(kvp =>
 					kvp.Key.x >= chunkPos.x - 1 &&
