@@ -26,6 +26,17 @@ namespace VoxelWorld2.Generators.Common
 		/// <returns></returns>
 		byte? GetBlockAt(in Vector3Int position);
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="position"></param>
+		/// <param name="blockId"></param>
 		void SetBlockAt(in Vector3Int position, byte blockId);
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="newSize"></param>
+		void Resize(in Vector3Int newSize);
 	}
 }

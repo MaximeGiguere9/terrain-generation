@@ -66,5 +66,10 @@ namespace VoxelWorld2.Generators.Structures
 		{
 			throw new NotSupportedException();
 		}
+
+		public void Resize(in Vector3Int newSize)
+		{
+			throw new NotSupportedException();
+		}
 	}
 }
