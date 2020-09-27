@@ -66,6 +66,11 @@ namespace VoxelWorld3
 
 		private static Dictionary<byte, BlockModel> _blocks;
 
+		private BlockService()
+		{
+			LoadBlocks("blocks");
+		}
+
 		public void LoadBlocks(string path)
 		{
 			if (_blocks != null) return;

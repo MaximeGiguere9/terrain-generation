@@ -25,7 +25,7 @@ namespace VoxelWorld3.Chunks
 			this.chunk = chunk;
 			this.subdivisionIndex = subdivisionIndex;
 
-			this.offset = chunk.GetWorldSpacePosition().y / chunk.GetSubdivisionCount() *
+			this.offset = chunk.GetSize().y / chunk.GetSubdivisionCount() *
 			              this.subdivisionIndex * Vector3Int.up;
 
 			this.size = chunk.GetSize();
@@ -102,16 +102,17 @@ namespace VoxelWorld3.Chunks
 						);
 					}
 
-					if (!neighborBlock.HasValue) continue;
+					if (neighborBlock.HasValue && neighborBlock.Value > 0)
+					{
+						BlockModel neighborBlockModel = this.blockService.GetBlockModel(neighborBlock.Value);
 
-					BlockModel neighborBlockModel = this.blockService.GetBlockModel(neighborBlock.Value);
+						if (blockModel == null || neighborBlockModel == null)
+							throw new InvalidOperationException("missing block model(s)");
 
-					if(blockModel == null || neighborBlockModel == null)
-						throw new InvalidOperationException("missing block model(s)");
+						bool isFaceVisible = neighborBlockModel.Transparent && !(block == neighborBlock.Value && blockModel.HideConnectingFaces);
 
-					bool isFaceVisible = neighborBlockModel.Transparent && !(block == neighborBlock.Value && blockModel.HideConnectingFaces);
-
-					if (!isFaceVisible) continue;
+						if (!isFaceVisible) continue;
+					}
 
 					vertices.AddRange(this.blockService.GetFaceVertices(pos, i));
 					uvs.AddRange(this.blockService.GetFaceUVs(block, i));
