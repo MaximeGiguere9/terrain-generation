@@ -16,6 +16,8 @@ namespace VoxelWorld3
 
 		private readonly BlockService blockService;
 
+		private Mesh cachedMesh;
+
 		public SubChunk(in Chunk chunk, byte subdivisionIndex)
 		{
 			this.blockService = BlockService.Instance;
@@ -43,6 +45,18 @@ namespace VoxelWorld3
 		{
 			Vector2Int chunkPos = this.chunk.GetWorldSpacePosition();
 			return new CoordinateIterator(this.size, new Vector3Int(chunkPos.x, this.offset.y, chunkPos.y));
+		}
+
+		public void InvalidateMesh()
+		{
+			this.cachedMesh = null;
+		}
+
+		public Mesh GetMesh()
+		{
+			if (this.cachedMesh == null)
+				this.cachedMesh = GenerateMesh();
+			return this.cachedMesh;
 		}
 
 		private Mesh GenerateMesh()

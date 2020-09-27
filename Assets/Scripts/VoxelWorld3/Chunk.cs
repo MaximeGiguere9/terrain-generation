@@ -8,9 +8,6 @@ namespace VoxelWorld3
 	[Serializable]
 	public class Chunk
 	{
-		public static Vector3Int CHUNK_SIZE = new Vector3Int(16, 256, 16);
-		public static byte CHUNK_SUBDIVISIONS = 16;
-
 		[SerializeField] private byte[] blocks;
 		[SerializeField] private Vector3Int size;
 		[SerializeField] private byte subdivisions;
@@ -26,10 +23,10 @@ namespace VoxelWorld3
 
 		private SubChunk[] subChunks;
 
-		public Chunk()
+		public Chunk(Vector3Int size, byte subdivisions)
 		{
-			this.size = CHUNK_SIZE;
-			this.subdivisions = CHUNK_SUBDIVISIONS;
+			this.size = size;
+			this.subdivisions = subdivisions;
 			this.neighbors = new Dictionary<Neighbors, Chunk>();
 
 			if(this.size.y % this.subdivisions != 0)
