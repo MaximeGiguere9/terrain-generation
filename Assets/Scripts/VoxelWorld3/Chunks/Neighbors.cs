@@ -1,4 +1,4 @@
-﻿namespace VoxelWorld3
+﻿namespace VoxelWorld3.Chunks
 {
 	public enum Neighbors
 	{

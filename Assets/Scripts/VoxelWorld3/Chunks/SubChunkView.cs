@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VoxelWorld3
+namespace VoxelWorld3.Chunks
 {
 	public class SubChunkView : MonoBehaviour
 	{

@@ -5,7 +5,7 @@ using UnityEngine;
 using VoxelWorld2.Blocks;
 using VoxelWorld2.Utils;
 
-namespace VoxelWorld3
+namespace VoxelWorld3.Chunks
 {
 	public class SubChunk
 	{

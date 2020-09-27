@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace VoxelWorld3
+namespace VoxelWorld3.Chunks
 {
 	[Serializable]
 	public class Chunk

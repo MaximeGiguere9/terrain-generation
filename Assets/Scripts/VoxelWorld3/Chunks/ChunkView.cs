@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace VoxelWorld3
+namespace VoxelWorld3.Chunks
 {
 	public class ChunkView : MonoBehaviour
 	{
