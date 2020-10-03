@@ -19,7 +19,7 @@ namespace VoxelWorld3.Chunks
 		/// e.g.if the block's x pos is zero, check neighbor at (-1,0)
 		/// still O(1) lookup, but less coupling and more control over call stack
 		/// </summary>
-		private Dictionary<Neighbors, Chunk> neighbors;
+		private Dictionary<Neighbor, Chunk> neighbors;
 
 		private SubChunk[] subChunks;
 
@@ -27,7 +27,7 @@ namespace VoxelWorld3.Chunks
 		{
 			this.size = size;
 			this.subdivisions = subdivisions;
-			this.neighbors = new Dictionary<Neighbors, Chunk>();
+			this.neighbors = new Dictionary<Neighbor, Chunk>();
 
 			if(this.size.y % this.subdivisions != 0)
 				throw new InvalidOperationException("Cannot subdivide cleanly");
@@ -117,9 +117,14 @@ namespace VoxelWorld3.Chunks
 		}
 
 		[CanBeNull]
-		public Chunk GetNeighbor(Neighbors neighbor)
+		public Chunk GetNeighbor(Neighbor neighborPos)
 		{
-			return this.neighbors.TryGetValue(neighbor, out Chunk chunk) ? chunk : null;
+			return this.neighbors.TryGetValue(neighborPos, out Chunk chunk) ? chunk : null;
+		}
+
+		public void SetNeighbor(Neighbor neighborPos, Chunk neighborChunk)
+		{
+			this.neighbors[neighborPos] = neighborChunk;
 		}
 
 

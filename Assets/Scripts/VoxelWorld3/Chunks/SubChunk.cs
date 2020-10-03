@@ -85,21 +85,32 @@ namespace VoxelWorld3.Chunks
 					Chunk neighborChunk = this.chunk;
 
 					if (neighborPos.x < 0)
-						neighborChunk = this.chunk.GetNeighbor(Neighbors.West);
+						neighborChunk = this.chunk.GetNeighbor(Neighbor.West);
 					else if (neighborPos.x >= this.chunk.GetSize().x)
-						neighborChunk = this.chunk.GetNeighbor(Neighbors.East);
+						neighborChunk = this.chunk.GetNeighbor(Neighbor.East);
 					else if (neighborPos.z < 0)
-						neighborChunk = this.chunk.GetNeighbor(Neighbors.North);
+						neighborChunk = this.chunk.GetNeighbor(Neighbor.North);
 					else if (neighborPos.z >= this.chunk.GetSize().z)
-						neighborChunk = this.chunk.GetNeighbor(Neighbors.South);
+						neighborChunk = this.chunk.GetNeighbor(Neighbor.South);
 
 					byte? neighborBlock = null;
-					if (neighborChunk != null && neighborPos.y >= 0 && neighborPos.y < this.chunk.GetSize().y)
+
+					if (neighborPos.y >= 0 && neighborPos.y < this.chunk.GetSize().y)
 					{
-						Vector3Int neighborSize = neighborChunk.GetSize();
-						neighborBlock = neighborChunk.GetBlockAtLocalPosition(
-							new Vector3Int(neighborPos.x % neighborSize.x, neighborPos.y, neighborPos.z % neighborSize.z)
-						);
+						if (neighborChunk == this.chunk)
+						{
+							neighborBlock = this.chunk.GetBlockAtLocalPosition(neighborPos);
+						}
+						else if (neighborChunk != null)
+						{
+							Vector3Int neighborSize = neighborChunk.GetSize();
+							Vector3Int neighborBlockLocalPos = new Vector3Int(
+								MathUtils.Mod(neighborPos.x, neighborSize.x),
+								neighborPos.y,
+								MathUtils.Mod(neighborPos.z, neighborSize.z)
+							);
+							neighborBlock = neighborChunk.GetBlockAtLocalPosition(neighborBlockLocalPos);
+						}
 					}
 
 					if (neighborBlock.HasValue && neighborBlock.Value > 0)

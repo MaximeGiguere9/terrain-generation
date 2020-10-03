@@ -31,6 +31,7 @@ namespace VoxelWorld3
 			LoadChunk(new Vector2Int(-1, 0));
 			LoadChunk(new Vector2Int(0, 1));
 			LoadChunk(new Vector2Int(0, -1));
+			RenderAll();
 		}
 
 		//has a terrain generator
@@ -41,18 +42,13 @@ namespace VoxelWorld3
 
 			if (!this.chunks.ContainsKey(chunkPos))
 			{
-				Chunk newChunk = new Chunk(CHUNK_SIZE, CHUNK_SUBDIVISIONS);
-				newChunk.SetChunkSpacePosition(chunkPos);
-				CoordinateIterator itr = new CoordinateIterator(new Vector3Int(16, 8, 16), Vector3Int.zero);
-				foreach (Vector3Int c in itr) newChunk.SetBlockAtLocalPosition(in c, 1);
-				this.chunks.Add(chunkPos, newChunk);
+				CreateChunk(chunkPos);
 			}
 
 			Chunk chunk = this.chunks[chunkPos];
 			ChunkView chunkView = Object.Instantiate(this.chunkViewPrefab, this.transform).GetComponent<ChunkView>();
 			chunkView.SetChunk(chunk);
 			this.chunkViews.Add(chunkPos, chunkView);
-			chunkView.Render();
 
 			//if chunk exists render it, else have the terrain generator create it first
 
@@ -73,6 +69,32 @@ namespace VoxelWorld3
 			if (!this.chunkViews.ContainsKey(chunkPos)) return;
 			this.chunkViews[chunkPos].Destroy();
 			this.chunkViews.Remove(chunkPos);
+		}
+
+		private void CreateChunk(Vector2Int chunkPos)
+		{
+			Chunk newChunk = new Chunk(CHUNK_SIZE, CHUNK_SUBDIVISIONS);
+			newChunk.SetChunkSpacePosition(chunkPos);
+			this.chunks.Add(chunkPos, newChunk);
+
+			foreach (Neighbor neighborPos in Neighbor.All)
+			{
+				this.chunks.TryGetValue(chunkPos + neighborPos.Value, out Chunk neighborChunk);
+				if (neighborChunk == null) continue;
+				newChunk.SetNeighbor(neighborPos, neighborChunk);
+				neighborChunk.SetNeighbor(Neighbor.Opposite(neighborPos), newChunk);
+			}
+
+			CoordinateIterator itr = new CoordinateIterator(new Vector3Int(16, 48, 16), Vector3Int.zero);
+			foreach (Vector3Int c in itr) newChunk.SetBlockAtLocalPosition(in c, 1);
+		}
+
+		public void RenderAll()
+		{
+			foreach (var view in this.chunkViews)
+			{
+				view.Value.Render();
+			}
 		}
 	}
 }
