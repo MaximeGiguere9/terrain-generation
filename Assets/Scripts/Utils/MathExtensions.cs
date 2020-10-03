@@ -1,4 +1,4 @@
-﻿namespace VoxelWorld3
+﻿namespace Utils
 {
 	public static class MathUtils
 	{

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using VoxelWorld.Terrain;
+using Utils;
 using VoxelWorld2.Generators.Common;
 using VoxelWorld2.Utils;
 

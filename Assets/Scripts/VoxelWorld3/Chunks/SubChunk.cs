@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Utils;
 using VoxelWorld2.Blocks;
-using VoxelWorld2.Utils;
 
 namespace VoxelWorld3.Chunks
 {

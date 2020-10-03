@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
+using Utils;
 
 namespace VoxelWorld3.Chunks
 {
@@ -125,6 +126,16 @@ namespace VoxelWorld3.Chunks
 		public void SetNeighbor(Neighbor neighborPos, Chunk neighborChunk)
 		{
 			this.neighbors[neighborPos] = neighborChunk;
+		}
+
+		public CoordinateIterator GetLocalSpaceIterator()
+		{
+			return new CoordinateIterator(this.size, Vector3Int.zero);
+		}
+
+		public CoordinateIterator GetWorldSpaceIterator()
+		{
+			return new CoordinateIterator(this.size, new Vector3Int(this.worldSpacePosition.x, 0, this.worldSpacePosition.y));
 		}
 
 

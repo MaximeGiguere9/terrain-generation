@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using VoxelWorld2.Utils;
+using Utils;
 using VoxelWorld3.Chunks;
 using Object = UnityEngine.Object;
 
@@ -24,17 +23,28 @@ namespace VoxelWorld3
 		/// </summary>
 		private readonly Dictionary<Vector2Int, ChunkView> chunkViews = new Dictionary<Vector2Int, ChunkView>();
 
+		private readonly ExampleInfiniteTerrainGenerator terrainGenerator = new ExampleInfiniteTerrainGenerator();
+
 		private void Start()
 		{
-			LoadChunk(new Vector2Int(0, 0));
-			LoadChunk(new Vector2Int(1, 0));
-			LoadChunk(new Vector2Int(-1, 0));
-			LoadChunk(new Vector2Int(0, 1));
-			LoadChunk(new Vector2Int(0, -1));
+			this.terrainGenerator.Initialize();
+
+			foreach (Vector3Int pos in new CoordinateIterator(new Vector3Int(7,1,7), Vector3Int.zero))
+				LoadChunk(new Vector2Int(pos.x, pos.z));
+
 			RenderAll();
 		}
 
-		//has a terrain generator
+		public void LoadChunks(IEnumerable<Vector2Int> chunkPositions)
+		{
+			int count = 0;
+			foreach (Vector2Int pos in chunkPositions)
+			{
+				count++;
+				LoadChunk(pos);
+			}
+			if(count > 0) RenderAll();
+		}
 
 		public void LoadChunk(Vector2Int chunkPos)
 		{
@@ -64,6 +74,11 @@ namespace VoxelWorld3
 			//
 		}
 
+		public void UnloadChunks(IEnumerable<Vector2Int> chunkPositions)
+		{
+			foreach (Vector2Int pos in chunkPositions) UnloadChunk(pos);
+		}
+
 		public void UnloadChunk(Vector2Int chunkPos)
 		{
 			if (!this.chunkViews.ContainsKey(chunkPos)) return;
@@ -85,8 +100,10 @@ namespace VoxelWorld3
 				neighborChunk.SetNeighbor(Neighbor.Opposite(neighborPos), newChunk);
 			}
 
-			CoordinateIterator itr = new CoordinateIterator(new Vector3Int(16, 48, 16), Vector3Int.zero);
-			foreach (Vector3Int c in itr) newChunk.SetBlockAtLocalPosition(in c, 1);
+			this.terrainGenerator.Generate(ref newChunk);
+
+			/*CoordinateIterator itr = new CoordinateIterator(new Vector3Int(16, 48, 16), Vector3Int.zero);
+			foreach (Vector3Int c in itr) newChunk.SetBlockAtLocalPosition(in c, 1);*/
 		}
 
 		public void RenderAll()

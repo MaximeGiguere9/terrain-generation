@@ -1,5 +1,5 @@
-﻿using VoxelWorld2.Generators.Common;
-using VoxelWorld2.Utils;
+﻿using Utils;
+using VoxelWorld2.Generators.Common;
 
 namespace VoxelWorld2.Generators.Terrain
 {

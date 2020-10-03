@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace VoxelWorld2.Utils
+namespace Utils
 {
 	/// <summary>
 	/// 1-loop shortcut to 3-loop x,y,z iteration
