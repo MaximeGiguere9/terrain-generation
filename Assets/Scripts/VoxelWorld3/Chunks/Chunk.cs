@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -110,7 +110,7 @@ namespace VoxelWorld3.Chunks
 			return this.subChunks;
 		}
 
-		public SubChunk GetSubChunk(byte index)
+		public SubChunk GetSubChunk(int index)
 		{
 			if(index >= this.subdivisions)
 				throw new ArgumentOutOfRangeException(nameof(index));
@@ -126,6 +126,7 @@ namespace VoxelWorld3.Chunks
 		public void SetNeighbor(Neighbor neighborPos, Chunk neighborChunk)
 		{
 			this.neighbors[neighborPos] = neighborChunk;
+			foreach (SubChunk subChunk in this.subChunks) subChunk.InvalidateMesh();
 		}
 
 		public CoordinateIterator GetLocalSpaceIterator()
@@ -137,7 +138,6 @@ namespace VoxelWorld3.Chunks
 		{
 			return new CoordinateIterator(this.size, new Vector3Int(this.worldSpacePosition.x, 0, this.worldSpacePosition.y));
 		}
-
 
 		public static int GetOffset(in Vector3Int position, in Vector3Int size) =>
 			position.y * size.x * size.z + position.z * size.x + position.x;

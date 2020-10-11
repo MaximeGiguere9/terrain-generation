@@ -26,10 +26,7 @@ namespace VoxelWorld3.Chunks
 		public void Render()
 		{
 			for (byte i = 0; i < this.subChunkViews.Count; i++)
-			{
-				SubChunk subChunk = this.chunk.GetSubChunk(i);
-				this.subChunkViews[i].SetMesh(subChunk.GetMesh());
-			}
+				this.subChunkViews[i].SetSubChunk(this.chunk.GetSubChunk(i));
 
 			Vector2Int pos = this.chunk.GetWorldSpacePosition();
 			gameObject.transform.position = new Vector3(pos.x, 0, pos.y);

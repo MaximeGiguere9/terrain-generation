@@ -4,9 +4,9 @@ using JetBrains.Annotations;
 using UnityEngine;
 using VoxelWorld2.Blocks;
 
-namespace VoxelWorld3
+namespace VoxelWorld3.Blocks
 {
-	public class BlockService
+	public class BlockService : IBlockShapeProvider
 	{
 		#region Block Geometry Order
 
@@ -80,10 +80,14 @@ namespace VoxelWorld3
 			_blocks = config.Blocks.ToDictionary(b => b.Id, b => b);
 		}
 
+		public Vector3Int[] GetVertexOrder() => VertexOrder;
+
 		/// <summary>
 		/// The 6 face normals of the block
 		/// </summary>
 		public Vector3Int[] GetFaceOrder() => FaceOrder;
+
+		public byte[][] GetFaceVertexOrder() => FaceVertexOrder;
 
 		public byte[] GetFaceTriangleOrder() => FaceTriangleOrder;
 

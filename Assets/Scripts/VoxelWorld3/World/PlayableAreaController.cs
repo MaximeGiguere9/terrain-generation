@@ -8,11 +8,17 @@ namespace VoxelWorld3.World
 {
 	public class PlayableAreaController : MonoBehaviour
 	{
-		[SerializeField] private WorldView world;
 		[SerializeField] private GameObject player;
 		[SerializeField] private int radius;
 
+		private WorldService world;
+
 		private List<Vector2Int> lastArea = new List<Vector2Int>();
+
+		private void Start()
+		{
+			this.world = WorldService.Instance;
+		}
 
 		private void Update()
 		{
@@ -30,31 +36,33 @@ namespace VoxelWorld3.World
 
 			this.lastArea = newArea;
 
-			Vector3Int start = new Vector3Int(playerChunk.x - radius, 0, playerChunk.z - radius) * VoxelSettings.Instance.ChunkSize;
-			Vector3Int end = new Vector3Int(playerChunk.x + radius, 128, playerChunk.z + radius) * VoxelSettings.Instance.ChunkSize;
-
-
-
-			Debug.DrawLine(start, new Vector3(end.x, start.y, start.z), Color.green);
-			Debug.DrawLine(start, new Vector3(start.x, end.y, start.z), Color.green);
-			Debug.DrawLine(start, new Vector3(start.x, start.y, end.z), Color.green);
-
-			Debug.DrawLine(new Vector3(end.x, end.y, start.z), new Vector3(start.x, end.y, start.z), Color.green);
-			Debug.DrawLine(new Vector3(end.x, end.y, start.z), new Vector3(end.x, start.y, start.z), Color.green);
-			Debug.DrawLine(new Vector3(end.x, end.y, start.z), new Vector3(end.x, end.y, end.z), Color.green);
-
-			Debug.DrawLine(new Vector3(start.x, end.y, end.z), new Vector3(end.x, end.y, end.z), Color.green);
-			Debug.DrawLine(new Vector3(start.x, end.y, end.z), new Vector3(start.x, start.y, end.z), Color.green);
-			Debug.DrawLine(new Vector3(start.x, end.y, end.z), new Vector3(start.x, end.y, start.z), Color.green);
-
-			Debug.DrawLine(new Vector3(end.x, start.y, end.z), new Vector3(start.x, start.y, end.z), Color.green);
-			Debug.DrawLine(new Vector3(end.x, start.y, end.z), new Vector3(end.x, end.y, end.z), Color.green);
-			Debug.DrawLine(new Vector3(end.x, start.y, end.z), new Vector3(end.x, start.y, start.z), Color.green);
+			Vector3Int start = new Vector3Int(playerChunk.x - radius, 0, playerChunk.z - radius) * WorldService.CHUNK_SIZE;
+			Vector3Int end = new Vector3Int(playerChunk.x + radius, 128, playerChunk.z + radius) * WorldService.CHUNK_SIZE;
+			DrawBounds(start, end);
 		}
 
 		private static Vector3Int GetChunkPosition(Vector3 worldPosition)
 		{
 			return Vector3Int.FloorToInt(worldPosition / VoxelSettings.Instance.ChunkSize);
+		}
+
+		private static void DrawBounds(Vector3Int a, Vector3Int b)
+		{
+			Debug.DrawLine(a, new Vector3(b.x, a.y, a.z), Color.green);
+			Debug.DrawLine(a, new Vector3(a.x, b.y, a.z), Color.green);
+			Debug.DrawLine(a, new Vector3(a.x, a.y, b.z), Color.green);
+
+			Debug.DrawLine(new Vector3(b.x, b.y, a.z), new Vector3(a.x, b.y, a.z), Color.green);
+			Debug.DrawLine(new Vector3(b.x, b.y, a.z), new Vector3(b.x, a.y, a.z), Color.green);
+			Debug.DrawLine(new Vector3(b.x, b.y, a.z), new Vector3(b.x, b.y, b.z), Color.green);
+
+			Debug.DrawLine(new Vector3(a.x, b.y, b.z), new Vector3(b.x, b.y, b.z), Color.green);
+			Debug.DrawLine(new Vector3(a.x, b.y, b.z), new Vector3(a.x, a.y, b.z), Color.green);
+			Debug.DrawLine(new Vector3(a.x, b.y, b.z), new Vector3(a.x, b.y, a.z), Color.green);
+
+			Debug.DrawLine(new Vector3(b.x, a.y, b.z), new Vector3(a.x, a.y, b.z), Color.green);
+			Debug.DrawLine(new Vector3(b.x, a.y, b.z), new Vector3(b.x, b.y, b.z), Color.green);
+			Debug.DrawLine(new Vector3(b.x, a.y, b.z), new Vector3(b.x, a.y, a.z), Color.green);
 		}
 	}
 }

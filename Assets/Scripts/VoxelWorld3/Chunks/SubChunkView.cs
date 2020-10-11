@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace VoxelWorld3.Chunks
 {
@@ -7,8 +8,20 @@ namespace VoxelWorld3.Chunks
 		[SerializeField] private MeshFilter meshFilter;
 		[SerializeField] private MeshCollider meshCollider;
 
-		public void SetMesh(Mesh mesh)
+		private SubChunk subChunk;
+
+		public void SetSubChunk(SubChunk subChunk)
 		{
+			if (this.subChunk == subChunk) return;
+			if(this.subChunk != null) this.subChunk.OnMeshInvalidated -= this.OnMeshInvalidated;
+			this.subChunk = subChunk;
+			this.subChunk.OnMeshInvalidated += this.OnMeshInvalidated;
+			this.OnMeshInvalidated();
+		}
+
+		private void OnMeshInvalidated()
+		{
+			Mesh mesh = this.subChunk.GetMesh();
 			if (this.meshFilter.mesh == mesh) return;
 			this.meshFilter.mesh = mesh;
 			this.meshCollider.sharedMesh = this.meshFilter.sharedMesh;
@@ -18,6 +31,11 @@ namespace VoxelWorld3.Chunks
 		public void Destroy()
 		{
 			UnityEngine.Object.Destroy(this.gameObject);
+		}
+
+		private void OnDestroy()
+		{
+			if (this.subChunk != null) this.subChunk.OnMeshInvalidated -= this.OnMeshInvalidated;
 		}
 	}
 }

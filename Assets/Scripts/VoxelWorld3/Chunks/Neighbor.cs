@@ -10,9 +10,21 @@ namespace VoxelWorld3.Chunks
 	/// </summary>
 	public sealed class Neighbor
 	{
+		/// <summary>
+		/// (1, 0)
+		/// </summary>
 		public static readonly Neighbor East = new Neighbor(0, Vector2Int.right);
+		/// <summary>
+		/// (0, -1)
+		/// </summary>
 		public static readonly Neighbor North = new Neighbor(1, Vector2Int.down);
+		/// <summary>
+		/// (-1, 0)
+		/// </summary>
 		public static readonly Neighbor West = new Neighbor(2, Vector2Int.left);
+		/// <summary>
+		/// (0, 1)
+		/// </summary>
 		public static readonly Neighbor South = new Neighbor(3, Vector2Int.up);
 		public static IEnumerable<Neighbor> All = new[] { East, North, West, South };
 

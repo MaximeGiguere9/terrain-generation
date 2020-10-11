@@ -4,11 +4,14 @@ using System.Linq;
 using UnityEngine;
 using Utils;
 using VoxelWorld2.Blocks;
+using BlockService = VoxelWorld3.Blocks.BlockService;
 
 namespace VoxelWorld3.Chunks
 {
 	public class SubChunk
 	{
+		public event Action OnMeshInvalidated;
+
 		private readonly Chunk chunk;
 		private readonly byte subdivisionIndex;
 		private readonly Vector3Int offset;
@@ -50,6 +53,7 @@ namespace VoxelWorld3.Chunks
 		public void InvalidateMesh()
 		{
 			this.cachedMesh = null;
+			OnMeshInvalidated?.Invoke();
 		}
 
 		public Mesh GetMesh()
