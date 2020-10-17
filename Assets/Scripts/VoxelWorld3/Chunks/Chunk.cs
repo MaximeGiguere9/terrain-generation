@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -79,13 +79,13 @@ namespace VoxelWorld3.Chunks
 
 		public byte GetBlockAtWorldPosition(in Vector3Int position)
 		{
-			Vector3Int localPos = new Vector3Int(position.x % this.size.x, position.y, position.z % this.size.z);
+			Vector3Int localPos = new Vector3Int(MathUtils.Mod(position.x, this.size.x), position.y, MathUtils.Mod(position.z, this.size.z));
 			return GetBlockAtLocalPosition(in localPos);
 		}
 
 		public void SetBlockAtWorldPosition(in Vector3Int position, byte blockId)
 		{
-			Vector3Int localPos = new Vector3Int(position.x % this.size.x, position.y, position.z % this.size.z);
+			Vector3Int localPos = new Vector3Int(MathUtils.Mod(position.x, this.size.x), position.y, MathUtils.Mod(position.z, this.size.z));
 			SetBlockAtLocalPosition(in localPos, blockId);
 		}
 

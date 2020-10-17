@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
+using Utils;
 using VoxelWorld3.Chunks;
 
 namespace VoxelWorld3.World
@@ -126,7 +127,10 @@ namespace VoxelWorld3.World
 		[CanBeNull]
 		public Chunk GetChunkFromWorldPosition(in Vector3Int worldPos)
 		{
-			Vector2Int chunkPos = new Vector2Int(worldPos.x / CHUNK_SIZE.x, worldPos.z / CHUNK_SIZE.z);
+			Vector2Int chunkPos = new Vector2Int(
+				Mathf.FloorToInt((float) worldPos.x / CHUNK_SIZE.x),
+				Mathf.FloorToInt((float) worldPos.z / CHUNK_SIZE.z)
+			);
 			this.chunks.TryGetValue(chunkPos, out Chunk chunk);
 			return chunk;
 		}
@@ -171,11 +175,11 @@ namespace VoxelWorld3.World
 					if (neighbor != null) subChunksToInvalidate.Add(neighbor.GetSubChunk(subdivisionIndex));
 				}
 
-				if (position.y % subdivisionSize == 0 && subdivisionIndex > 0)
+				if (MathUtils.Mod(position.y, subdivisionSize) == 0 && subdivisionIndex > 0)
 				{
 					subChunksToInvalidate.Add(chunk.GetSubChunk(subdivisionIndex - 1));
 				}
-				else if (position.y % subdivisionSize == subdivisionSize - 1 && subdivisionIndex < subdivisionCount)
+				else if (MathUtils.Mod(position.y, subdivisionSize) == subdivisionSize - 1 && subdivisionIndex < subdivisionCount)
 				{
 					subChunksToInvalidate.Add(chunk.GetSubChunk(subdivisionIndex + 1));
 				}
@@ -186,15 +190,13 @@ namespace VoxelWorld3.World
 
 		public byte? GetBlockAt(in Vector3Int position)
 		{
-			Vector2Int chunkPos = new Vector2Int(position.x / CHUNK_SIZE.x, position.z / CHUNK_SIZE.z);
-			this.chunks.TryGetValue(chunkPos, out Chunk chunk);
+			Chunk chunk = GetChunkFromWorldPosition(in position);
 			return chunk?.GetBlockAtWorldPosition(in position);
 		}
 
 		public bool SetBlockAt(in Vector3Int position, byte block)
 		{
-			Vector2Int chunkPos = new Vector2Int(position.x / CHUNK_SIZE.x, position.z / CHUNK_SIZE.z);
-			this.chunks.TryGetValue(chunkPos, out Chunk chunk);
+			Chunk chunk = GetChunkFromWorldPosition(in position);
 			if (chunk == null) return false;
 			chunk.SetBlockAtWorldPosition(in position, block);
 			UpdateAroundWorldPositions(position);

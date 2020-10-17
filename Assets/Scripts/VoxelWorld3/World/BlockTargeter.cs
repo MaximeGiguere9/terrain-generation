@@ -57,13 +57,15 @@ namespace VoxelWorld3.World
 			 *  - Execute points 1 and 2 on the new blocks in sequence until either a targetable block is found or the max distance is reached
 			 */
 
+			DrawTargetRay(position, direction, maxDistance, Color.cyan);
+
 			Vector3Int blockPosition = Vector3Int.FloorToInt(position);
 			HitPoint hitPoint = null;
 
 			// (will exit when max distance is reached or block is found)
 			while (GetDistanceToBlock(position, blockPosition) <= maxDistance)
 			{
-				if (DebugMode) DrawBlockOutline(blockPosition, Color.blue, blockShapeProvider);
+				DrawBlockOutline(blockPosition, Color.blue, blockShapeProvider);
 
 				//get normal of face through which ray exits block
 				Vector3Int? faceNormal = FindRayBoxExitNormal(position, direction, blockPosition, blockShapeProvider);
@@ -81,10 +83,12 @@ namespace VoxelWorld3.World
 				if (!blockId.HasValue || blockId <= 0)
 					continue;
 
-				if (DebugMode) DrawBlockNormal(blockPosition, exitFace * -1, Color.blue);
-
 				//found block, collision normal is inverse of current block exit point (next block entry point)
 				hitPoint = new HitPoint(blockPosition, exitFace * -1);
+
+				DrawBlockOutline(hitPoint.Position, Color.cyan, blockShapeProvider);
+				DrawBlockNormal(blockPosition, exitFace * -1, Color.cyan);
+
 				break;
 			}
 
@@ -189,6 +193,8 @@ namespace VoxelWorld3.World
 		/// <param name="color"></param>
 		private static void DrawBlockOutline(Vector3Int position, Color color, IBlockShapeProvider blockShapeProvider)
 		{
+			if (!DebugMode) return;
+
 			var verts = blockShapeProvider.GetVertexOrder();
 			var faceVerts = blockShapeProvider.GetFaceVertexOrder();
 
@@ -212,7 +218,23 @@ namespace VoxelWorld3.World
 		/// <param name="color"></param>
 		private static void DrawBlockNormal(Vector3 position, Vector3 faceNormal, Color color)
 		{
+			if (!DebugMode) return;
+
 			Debug.DrawRay(position + BlockSize / 2, faceNormal / 2, color);
+		}
+
+		/// <summary>
+		/// Debug
+		/// </summary>
+		/// <param name="position"></param>
+		/// <param name="direction"></param>
+		/// <param name="maxDistance"></param>
+		/// <param name="color"></param>
+		private static void DrawTargetRay(Vector3 position, Vector3 direction, float maxDistance, Color color)
+		{
+			if (!DebugMode) return;
+
+			Debug.DrawLine(position, position + direction * maxDistance, color);
 		}
 
 	}

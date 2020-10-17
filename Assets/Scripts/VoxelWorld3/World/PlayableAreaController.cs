@@ -25,7 +25,7 @@ namespace VoxelWorld3.World
 			Vector3Int playerChunk = GetChunkPosition(player.transform.position);
 
 			CoordinateIterator iterator = new CoordinateIterator(
-				new Vector3Int(radius * 2, 1, radius * 2),
+				new Vector3Int(radius * 2 + 1, 1, radius * 2 + 1),
 				new Vector3Int(playerChunk.x - radius, 0, playerChunk.z - radius)
 			);
 
