@@ -6,7 +6,8 @@ using UnityEngine;
 namespace Utils
 {
 	/// <summary>
-	/// 1-loop shortcut to 3-loop x,y,z iteration
+	/// 1-loop shortcut to 3-loop x,y,z iteration.
+	/// The loop is "x-major", then prioritizes z, then y.
 	/// </summary>
 	public class CoordinateIterator : IEnumerator<Vector3Int>, IEnumerable<Vector3Int>
 	{

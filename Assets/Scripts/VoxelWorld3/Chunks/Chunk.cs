@@ -126,7 +126,6 @@ namespace VoxelWorld3.Chunks
 		public void SetNeighbor(Neighbor neighborPos, Chunk neighborChunk)
 		{
 			this.neighbors[neighborPos] = neighborChunk;
-			foreach (SubChunk subChunk in this.subChunks) subChunk.InvalidateMesh();
 		}
 
 		public CoordinateIterator GetLocalSpaceIterator()

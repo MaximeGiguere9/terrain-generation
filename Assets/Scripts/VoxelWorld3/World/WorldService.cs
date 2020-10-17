@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -30,6 +31,10 @@ namespace VoxelWorld3.World
 
 		private readonly ExampleInfiniteTerrainGenerator terrainGenerator = new ExampleInfiniteTerrainGenerator();
 
+		private readonly List<Vector2Int> chunkLoadQueue = new List<Vector2Int>();
+
+		private bool isLoadingChunks;
+
 		public WorldService()
 		{
 			this.terrainGenerator.Initialize();
@@ -37,21 +42,39 @@ namespace VoxelWorld3.World
 
 		public void LoadChunks(IEnumerable<Vector2Int> chunkPositions)
 		{
-			HashSet<Vector2Int> res = new HashSet<Vector2Int>();
 			foreach (Vector2Int pos in chunkPositions)
 			{
 				if (this.loadedChunks.Contains(pos)) continue;
-				LoadOrCreateChunk(pos);
-				res.Add(pos);
+				this.chunkLoadQueue.Add(pos);
+				MonoBehaviourHelper.Start(LoadChunksRoutine());
 			}
-			if (res.Count > 0) OnChunksLoaded?.Invoke(res);
 		}
 
 		public void LoadChunk(Vector2Int chunkPos)
 		{
-			if (this.loadedChunks.Contains(chunkPos)) return;
-			LoadOrCreateChunk(chunkPos);
-			OnChunksLoaded?.Invoke(new[] {chunkPos});
+			this.chunkLoadQueue.Add(chunkPos);
+			MonoBehaviourHelper.Start(LoadChunksRoutine());
+		}
+
+		private IEnumerator LoadChunksRoutine()
+		{
+			if (this.isLoadingChunks) yield break;
+			this.isLoadingChunks = true;
+
+			while (this.chunkLoadQueue.Count > 0)
+			{
+				Vector2Int chunkPos = this.chunkLoadQueue[0];
+				if (this.loadedChunks.Contains(chunkPos)) continue;
+
+				this.chunkLoadQueue.RemoveAt(0);
+				LoadOrCreateChunk(chunkPos);
+
+				OnChunksLoaded?.Invoke(new[] {chunkPos});
+
+				yield return null;
+			}
+
+			this.isLoadingChunks = false;
 		}
 
 		public void UnloadChunks(IEnumerable<Vector2Int> chunkPositions)
@@ -59,6 +82,8 @@ namespace VoxelWorld3.World
 			HashSet<Vector2Int> res = new HashSet<Vector2Int>();
 			foreach (Vector2Int pos in chunkPositions)
 			{
+				this.chunkLoadQueue.Remove(pos);
+
 				if (this.loadedChunks.Remove(pos))
 					res.Add(pos);
 			}
@@ -67,6 +92,8 @@ namespace VoxelWorld3.World
 
 		public void UnloadChunk(Vector2Int chunkPos)
 		{
+			this.chunkLoadQueue.Remove(chunkPos);
+
 			if (this.loadedChunks.Remove(chunkPos))
 				OnChunksUnloaded?.Invoke(new[] {chunkPos});
 		}
@@ -83,15 +110,25 @@ namespace VoxelWorld3.World
 			newChunk.SetChunkSpacePosition(chunkPos);
 			this.chunks.Add(chunkPos, newChunk);
 
+			this.terrainGenerator.Generate(ref newChunk);
+
 			foreach (Neighbor neighborPos in Neighbor.All)
 			{
 				this.chunks.TryGetValue(chunkPos + neighborPos.Value, out Chunk neighborChunk);
 				if (neighborChunk == null) continue;
 				newChunk.SetNeighbor(neighborPos, neighborChunk);
 				neighborChunk.SetNeighbor(Neighbor.Opposite(neighborPos), newChunk);
+
+				foreach (var subChunk in neighborChunk.GetSubChunks())
+				{
+					subChunk.InvalidateMesh();
+				}
 			}
 
-			this.terrainGenerator.Generate(ref newChunk);
+			foreach (var subChunk in newChunk.GetSubChunks())
+			{
+				subChunk.InvalidateMesh();
+			}
 
 			/*CoordinateIterator itr = new CoordinateIterator(new Vector3Int(16, 48, 16), Vector3Int.zero);
 			foreach (Vector3Int c in itr) newChunk.SetBlockAtLocalPosition(in c, 1);*/
