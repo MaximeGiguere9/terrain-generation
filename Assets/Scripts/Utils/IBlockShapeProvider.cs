@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VoxelWorld3.Blocks
+namespace Utils
 {
 	public interface IBlockShapeProvider
 	{

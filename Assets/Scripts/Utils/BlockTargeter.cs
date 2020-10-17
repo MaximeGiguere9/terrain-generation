@@ -2,13 +2,10 @@
 using UnityEngine;
 using VoxelWorld3.Blocks;
 
-namespace VoxelWorld3.World
+namespace Utils
 {
-	public class BlockTargeter : MonoBehaviour
+	public static class BlockTargeter
 	{
-		[SerializeField] private Transform cameraTransform;
-		[SerializeField] private float maxTargetRange = 3;
-
 		public static readonly Vector3 BlockSize = Vector3Int.one;
 
 		public class HitPoint
@@ -24,29 +21,6 @@ namespace VoxelWorld3.World
 		}
 
 		public static bool DebugMode { get; set; } = false;
-
-		private void Update()
-		{
-			HitPoint targetHit = Target(
-				this.cameraTransform.position,
-				this.cameraTransform.forward,
-				this.maxTargetRange,
-				pos => WorldService.Instance.GetBlockAt(pos),
-				BlockService.Instance
-			);
-
-			if (targetHit == null) return;
-
-			if (Input.GetButtonDown("Fire1"))
-			{
-				WorldService.Instance.SetBlockAt(targetHit.Position, 0);
-			}
-			else if (Input.GetButtonDown("Fire2"))
-			{
-				WorldService.Instance.SetBlockAt(targetHit.Position + targetHit.Normal, 6);
-			}
-
-		}
 
 		public static HitPoint Target(Vector3 position, Vector3 direction, float maxDistance, Func<Vector3Int, byte?> blockGetter, IBlockShapeProvider blockShapeProvider)
 		{
