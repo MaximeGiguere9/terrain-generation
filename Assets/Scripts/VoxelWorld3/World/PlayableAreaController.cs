@@ -37,7 +37,7 @@ namespace VoxelWorld3.World
 			this.lastArea = newArea;
 
 			Vector3Int start = new Vector3Int(playerChunk.x - radius, 0, playerChunk.z - radius) * WorldService.CHUNK_SIZE;
-			Vector3Int end = new Vector3Int(playerChunk.x + radius, 128, playerChunk.z + radius) * WorldService.CHUNK_SIZE;
+			Vector3Int end = new Vector3Int(playerChunk.x + radius + 1, 1, playerChunk.z + radius + 1) * WorldService.CHUNK_SIZE;
 			DrawBounds(start, end);
 		}
 
