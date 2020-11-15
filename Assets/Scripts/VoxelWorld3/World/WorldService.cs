@@ -5,6 +5,8 @@ using JetBrains.Annotations;
 using UnityEngine;
 using Utils;
 using VoxelWorld3.Chunks;
+using VoxelWorld3.Generators;
+using VoxelWorld3.Generators.Biomes;
 
 namespace VoxelWorld3.World
 {
@@ -29,7 +31,8 @@ namespace VoxelWorld3.World
 		/// </summary>
 		private readonly HashSet<Vector2Int> loadedChunks = new HashSet<Vector2Int>();
 
-		private readonly ExampleInfiniteTerrainGenerator terrainGenerator = new ExampleInfiniteTerrainGenerator();
+		//private readonly ExampleInfiniteTerrainGenerator terrainGenerator = new ExampleInfiniteTerrainGenerator();
+		private readonly ITerrainGenerator terrainGenerator = new BiomesTerrainGenerator();
 
 		private readonly List<Vector2Int> chunkLoadQueue = new List<Vector2Int>();
 
