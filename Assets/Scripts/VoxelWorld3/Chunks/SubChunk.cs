@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Utils;
-using VoxelWorld2.Blocks;
+using VoxelWorld3.Blocks;
 using BlockService = VoxelWorld3.Blocks.BlockService;
 
 namespace VoxelWorld3.Chunks

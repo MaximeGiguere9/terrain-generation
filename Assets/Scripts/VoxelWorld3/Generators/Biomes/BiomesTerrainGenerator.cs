@@ -29,7 +29,6 @@ namespace VoxelWorld3.Generators.Biomes
 				Vector3Int worldPos = pos + offset;
 
 				float noise = Mathf.PerlinNoise(worldPos.x * this.biomeScale, worldPos.z * this.biomeScale);
-				Debug.Log(noise);
 
 				CoordinateIterator itr = new CoordinateIterator(Vector3Int.one, pos);
 

@@ -1,12 +1,10 @@
 ﻿using System;
 
-namespace VoxelWorld2.Utils
+namespace Utils
 {
 	public class PerlinNoise
 	{
-		public static float Sample(float x, float y, float z) => Noise(x, y, z);
-
-		private static float Noise(float x, float y, float z)
+		public static float Sample(float x, float y, float z)
 		{
 			int xi = (int) Math.Floor(x) & 255;
 			int yi = (int) Math.Floor(y) & 255;

@@ -2,7 +2,6 @@
 using System.Linq;
 using UnityEngine;
 using Utils;
-using VoxelWorld2.Utils;
 
 namespace VoxelWorld3.World
 {
@@ -43,7 +42,11 @@ namespace VoxelWorld3.World
 
 		private static Vector3Int GetChunkPosition(Vector3 worldPosition)
 		{
-			return Vector3Int.FloorToInt(worldPosition / VoxelSettings.Instance.ChunkSize);
+			return Vector3Int.FloorToInt(new Vector3(
+				worldPosition.x / WorldService.CHUNK_SIZE.x,
+				worldPosition.y / WorldService.CHUNK_SIZE.y,
+				worldPosition.z / WorldService.CHUNK_SIZE.z
+			));
 		}
 
 		private static void DrawBounds(Vector3Int a, Vector3Int b)

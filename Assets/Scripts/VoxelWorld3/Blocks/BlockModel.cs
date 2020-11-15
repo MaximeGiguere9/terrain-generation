@@ -1,4 +1,4 @@
-﻿namespace VoxelWorld2.Blocks
+﻿namespace VoxelWorld3.Blocks
 {
 	[System.Serializable]
 	public class BlockModel

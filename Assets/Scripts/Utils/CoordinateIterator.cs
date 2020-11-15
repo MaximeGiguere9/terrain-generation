@@ -15,9 +15,21 @@ namespace Utils
 		public readonly Vector3Int offset;
 		public readonly Vector3Int target;
 
-		public Vector3Int Current { get; private set; }
+		private Vector3Int current;
 
-		object IEnumerator.Current => Current;
+		public Vector3Int Current => this.current;
+
+		object IEnumerator.Current => this.current;
+
+		/// <summary>
+		/// 1d offset of the current position relative to the start of the iterator
+		/// </summary>
+		public int Index { get; private set; }
+
+		/// <summary>
+		/// 1d size of the iterator (size.x * size.y * size.z)
+		/// </summary>
+		public int Volume { get; }
 
 		public CoordinateIterator(Vector3Int size, Vector3Int offset)
 		{
@@ -27,31 +39,36 @@ namespace Utils
 			this.size = size;
 			this.offset = offset;
 			this.target = this.offset + this.size - Vector3Int.one;
+			this.Volume = this.size.x * this.size.y * this.size.z;
 			Reset();
 		}
 
 		public void Reset()
 		{
 			//place pointer before first element
-			this.Current = new Vector3Int(this.offset.x - 1, this.offset.y, this.offset.z);
+			this.current = new Vector3Int(this.offset.x - 1, this.offset.y, this.offset.z);
+			this.Index = -1;
 		}
 
 		public bool MoveNext()
 		{
-			if (this.Current.x < this.target.x)
+			if (this.current.x < this.target.x)
 			{
 				//move first left to right
-				this.Current = new Vector3Int(this.Current.x + 1, this.Current.y, this.Current.z);
+				this.current.x++;
 			}
-			else if (this.Current.z < this.target.z)
+			else if (this.current.z < this.target.z)
 			{
 				//if line is done, start the next one back to front
-				this.Current = new Vector3Int(this.offset.x, this.Current.y, this.Current.z + 1);
+				this.current.z++;
+				this.current.x = this.offset.x;
 			}
-			else if (this.Current.y < this.target.y)
+			else if (this.current.y < this.target.y)
 			{
 				//if layer is done start the next one down to up
-				this.Current = new Vector3Int(this.offset.x, this.Current.y + 1, this.offset.z);
+				this.current.y++;
+				this.current.x = this.offset.x;
+				this.current.z = this.offset.z;
 			}
 			else
 			{
@@ -59,6 +76,7 @@ namespace Utils
 				return false;
 			}
 
+			this.Index++;
 			return true;
 		}
 

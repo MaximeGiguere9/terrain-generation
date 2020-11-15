@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using Utils;
 using VoxelWorld3.Chunks;
+using VoxelWorld3.Generators.Structures;
 
 namespace VoxelWorld3.Generators.Biomes
 {
@@ -62,15 +64,10 @@ namespace VoxelWorld3.Generators.Biomes
 				    height < this.waterLevel)
 					continue;
 
-				new VoxelWorld2.Generators.Structures.TreeStructure().Generate(new Vector3Int(pos.x + offset.x, height, pos.z + offset.z), out VoxelWorld2.Generators.Common.IBlockGeneratorResult tree);
+				TreeStructure tree = new TreeStructure(new Vector3Int(pos.x + offset.x, height, pos.z + offset.z), Random.Range(3, 8));
 
-				CoordinateIterator treeIterator = new CoordinateIterator(tree.GetSize(), Vector3Int.zero);
-				foreach (Vector3Int treeBlockPos in treeIterator)
-				{
-					byte? treeBlock = tree.GetBlockAt(treeBlockPos);
-					if (treeBlock.HasValue)
-						chunk.SetBlockAtWorldPosition(tree.GetOffset() + treeBlockPos, treeBlock.Value);
-				}
+				foreach (KeyValuePair<Vector3Int, byte> treeBlock in tree.GetBlocks())
+					chunk.SetBlockAtWorldPosition(tree.GetOffset() + treeBlock.Key, treeBlock.Value);
 			}
 		}
 	}

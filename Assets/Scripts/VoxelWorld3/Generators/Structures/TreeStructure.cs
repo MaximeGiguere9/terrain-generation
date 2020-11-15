@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Utils;
-using VoxelWorld2.Generators.Common;
 
-namespace VoxelWorld2.Generators.Structures
+namespace VoxelWorld3.Generators.Structures
 {
-	public class TreeStructureResult : IBlockGeneratorResult
+	public class TreeStructure
 	{
 		private const int LEAVES_RADIUS = 2;
 
@@ -15,7 +13,7 @@ namespace VoxelWorld2.Generators.Structures
 		private readonly Vector3Int size;
 		private readonly Dictionary<Vector3Int, byte> blocks;
 
-		public TreeStructureResult(Vector3Int position, int height)
+		public TreeStructure(Vector3Int position, int height)
 		{
 			this.height = height;
 			this.offset = position - new Vector3Int(LEAVES_RADIUS, 0, LEAVES_RADIUS);
@@ -23,7 +21,7 @@ namespace VoxelWorld2.Generators.Structures
 			this.blocks = GenerateStructure();
 		}
 
-		public Dictionary<Vector3Int, byte> GenerateStructure()
+		private Dictionary<Vector3Int, byte> GenerateStructure()
 		{
 			Dictionary<Vector3Int, byte> result = new Dictionary<Vector3Int, byte>();
 
@@ -55,22 +53,6 @@ namespace VoxelWorld2.Generators.Structures
 
 		public Vector3Int GetSize() => this.size;
 
-		public byte? GetBlockAt(in Vector3Int position)
-		{
-			if (position.x < 0 || position.y < 0 || position.z < 0)
-				throw new ArgumentOutOfRangeException(nameof(position));
-
-			return this.blocks.TryGetValue(position, out byte block) ? block : (byte?) null;
-		}
-
-		public void SetBlockAt(in Vector3Int position, byte blockId)
-		{
-			throw new NotSupportedException();
-		}
-
-		public void Resize(in Vector3Int newSize)
-		{
-			throw new NotSupportedException();
-		}
+		public IReadOnlyDictionary<Vector3Int, byte> GetBlocks() => this.blocks;
 	}
 }

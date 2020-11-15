@@ -12,6 +12,9 @@ namespace VoxelWorld3.Generators
 
 
 
+		[Tooltip("Terrain generator to use")]
+		public TerrainGeneratorType TerrainGeneratorType;
+
 		public int Seed;
 
 		public float Scale = 0.005f;
