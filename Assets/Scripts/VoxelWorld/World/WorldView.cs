@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using VoxelWorld3.Chunks;
+using VoxelWorld.Chunks;
 using Object = UnityEngine.Object;
 
-namespace VoxelWorld3.World
+namespace VoxelWorld.World
 {
 	public class WorldView : MonoBehaviour
 	{

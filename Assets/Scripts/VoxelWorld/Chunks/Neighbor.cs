@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace VoxelWorld3.Chunks
+namespace VoxelWorld.Chunks
 {
 	/// <summary>
 	/// North and South refer to the z axis in 3d space, which means they are reversed when compared to axes on a 2d plane.

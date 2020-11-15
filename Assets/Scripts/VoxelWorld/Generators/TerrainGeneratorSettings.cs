@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VoxelWorld3.Generators
+namespace VoxelWorld.Generators
 {
 	[CreateAssetMenu(fileName = "TerrainGeneratorSettings", menuName = "Game Settings/Terrain Generator Settings", order = 100)]
 	public class TerrainGeneratorSettings : ScriptableObject

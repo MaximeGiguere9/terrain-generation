@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using UnityEngine;
 using Utils;
 
-namespace VoxelWorld3.Blocks
+namespace VoxelWorld.Blocks
 {
 	public class BlockService : IBlockShapeProvider
 	{

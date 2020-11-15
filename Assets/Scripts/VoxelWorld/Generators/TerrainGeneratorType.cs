@@ -1,4 +1,4 @@
-﻿namespace VoxelWorld3.Generators
+﻿namespace VoxelWorld.Generators
 {
 	public enum TerrainGeneratorType
 	{

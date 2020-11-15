@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Utils;
-using VoxelWorld3.Blocks;
-using BlockService = VoxelWorld3.Blocks.BlockService;
+using VoxelWorld.Blocks;
 
-namespace VoxelWorld3.Chunks
+namespace VoxelWorld.Chunks
 {
 	public class SubChunk
 	{

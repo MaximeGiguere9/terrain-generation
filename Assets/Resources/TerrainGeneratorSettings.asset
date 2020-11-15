@@ -12,18 +12,74 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: deac768add944ac389b5ead9bc4819d7, type: 3}
   m_Name: TerrainGeneratorSettings
   m_EditorClassIdentifier: 
-  Seed: 0
+  TerrainGeneratorType: 1
+  Seed: 23123
   Scale: 0.005
-  Offset: {x: 0, y: 0, z: 0}
+  Offset: {x: 10, y: 124, z: 234}
   Octaves: 3
-  Persistence: 0.5
-  Lacunarity: 2
+  Persistence: 0.25
+  Lacunarity: 4
   Density:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.8
+      inSlope: -4.590385
+      outSlope: -4.590385
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.12409973
+      value: 0.23033448
+      inSlope: -1.7642926
+      outSlope: -1.7642926
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.26304105
+      value: 0.37786233
+      inSlope: -1.9017715
+      outSlope: -1.9017715
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.2594393
+    - serializedVersion: 3
+      time: 0.5593424
+      value: 0.40019447
+      inSlope: -1.6245679
+      outSlope: -1.6245679
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.18212347
+      outWeight: 0.14037734
+    - serializedVersion: 3
+      time: 0.8989925
+      value: 0.65732557
+      inSlope: -2.8753211
+      outSlope: -2.8753211
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -6.5076895
+      outSlope: -6.5076895
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
   BaselineHeight: 32
-  WaterLevel: 32
-  BiomeScale: 1
+  WaterLevel: 25
+  BiomeScale: 0.001
+  CavernScale: 0.05

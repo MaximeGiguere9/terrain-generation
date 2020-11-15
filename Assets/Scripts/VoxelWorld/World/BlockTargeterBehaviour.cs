@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using Utils;
-using VoxelWorld3.Blocks;
+using VoxelWorld.Blocks;
 
-namespace VoxelWorld3.World
+namespace VoxelWorld.World
 {
 	public class BlockTargeterBehaviour : MonoBehaviour
 	{

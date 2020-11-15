@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using Utils;
-using VoxelWorld3.Chunks;
+using VoxelWorld.Chunks;
 
-namespace VoxelWorld3.Generators.Biomes
+namespace VoxelWorld.Generators.Biomes
 {
 	public class PlateauBiomeTerrainGenerator : TerrainGenerator
 	{

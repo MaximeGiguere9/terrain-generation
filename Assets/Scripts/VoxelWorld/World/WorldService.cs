@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
 using Utils;
-using VoxelWorld3.Chunks;
-using VoxelWorld3.Generators;
+using VoxelWorld.Chunks;
+using VoxelWorld.Generators;
 
-namespace VoxelWorld3.World
+namespace VoxelWorld.World
 {
 	public class WorldService
 	{

@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using VoxelWorld3.Blocks;
 
 namespace Utils
 {
@@ -89,7 +88,7 @@ namespace Utils
 		/// <returns>The normal of the face through which the ray exists the box, or null if the ray does not intersect the box</returns>
 		private static Vector3Int? FindRayBoxExitNormal(Vector3 rayOrigin, Vector3 rayDirection, Vector3Int blockPosition, IBlockShapeProvider blockShapeProvider)
 		{
-			var faces = BlockService.Instance.GetFaceOrder();
+			var faces = blockShapeProvider.GetFaceOrder();
 
 			for (int i = 0; i < faces.Length; i++)
 			{

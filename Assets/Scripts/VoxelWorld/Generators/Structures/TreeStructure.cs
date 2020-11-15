@@ -2,7 +2,7 @@
 using UnityEngine;
 using Utils;
 
-namespace VoxelWorld3.Generators.Structures
+namespace VoxelWorld.Generators.Structures
 {
 	public class TreeStructure
 	{

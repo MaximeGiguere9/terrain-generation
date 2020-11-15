@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using UnityEngine;
 using Utils;
 
-namespace VoxelWorld3.Chunks
+namespace VoxelWorld.Chunks
 {
 	[Serializable]
 	public class Chunk

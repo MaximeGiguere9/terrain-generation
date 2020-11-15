@@ -1,7 +1,7 @@
 ﻿using Utils;
-using VoxelWorld3.Chunks;
+using VoxelWorld.Chunks;
 
-namespace VoxelWorld3.Generators
+namespace VoxelWorld.Generators
 {
 	public interface ITerrainGenerator
 	{

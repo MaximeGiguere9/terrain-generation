@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using Utils;
-using VoxelWorld3.Chunks;
-using VoxelWorld3.Generators.Structures;
+using VoxelWorld.Chunks;
+using VoxelWorld.Generators.Structures;
 
-namespace VoxelWorld3.Generators.Biomes
+namespace VoxelWorld.Generators.Biomes
 {
 	public class PlainsBiomeTerrainGenerator : TerrainGenerator
 	{

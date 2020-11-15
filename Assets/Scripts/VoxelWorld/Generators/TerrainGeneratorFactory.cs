@@ -1,7 +1,7 @@
 ﻿using System;
-using VoxelWorld3.Generators.Biomes;
+using VoxelWorld.Generators.Biomes;
 
-namespace VoxelWorld3.Generators
+namespace VoxelWorld.Generators
 {
 	public class TerrainGeneratorFactory
 	{
