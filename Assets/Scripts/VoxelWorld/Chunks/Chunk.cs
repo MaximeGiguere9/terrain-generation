@@ -22,15 +22,19 @@ namespace VoxelWorld.Chunks
 		/// </summary>
 		private Dictionary<Neighbor, Chunk> neighbors;
 
+		private readonly Chunk[] neighborsArr;
+
 		private SubChunk[] subChunks;
 
-		private int[] sizeArr;
+		private int xLen;
+		private int xzArea;
 
 		public Chunk(Vector3Int size, byte subdivisions)
 		{
 			this.size = size;
 			this.subdivisions = subdivisions;
 			this.neighbors = new Dictionary<Neighbor, Chunk>();
+			this.neighborsArr = new Chunk[4];
 
 			if(this.size.y % this.subdivisions != 0)
 				throw new InvalidOperationException("Cannot subdivide cleanly");
@@ -43,8 +47,11 @@ namespace VoxelWorld.Chunks
 				this.subChunks[i] = new SubChunk(this, i);
 			}
 
-			this.sizeArr = new[] {this.size.x, this.size.y, this.size.z};
+			this.xLen = this.size.x;
+			this.xzArea = this.size.x * this.size.z;
 		}
+
+		public int GetBlocksLength() => this.blocks.Length;
 
 		public Vector3Int GetSize()
 		{
@@ -102,7 +109,12 @@ namespace VoxelWorld.Chunks
 
 		public byte GetBlockAtLocalPosition(in int x, in int y, in int z)
 		{
-			return this.blocks[y * this.sizeArr[0] * this.sizeArr[2] + z * this.sizeArr[0] + x];
+			return this.blocks[y * this.xzArea + z * this.xLen + x];
+		}
+
+		public byte GetBlockAtOffset(in int offset)
+		{
+			return this.blocks[offset];
 		}
 
 		public void SetBlockAtLocalPosition(in Vector3Int position, byte blockId)
@@ -131,9 +143,16 @@ namespace VoxelWorld.Chunks
 			return this.neighbors.TryGetValue(neighborPos, out Chunk chunk) ? chunk : null;
 		}
 
+		[CanBeNull]
+		public Chunk GetNeighbor(in int neighborIndex)
+		{
+			return this.neighborsArr[neighborIndex];
+		}
+
 		public void SetNeighbor(in Neighbor neighborPos, in Chunk neighborChunk)
 		{
 			this.neighbors[neighborPos] = neighborChunk;
+			this.neighborsArr[neighborPos.Index] = neighborChunk;
 		}
 
 		public CoordinateIterator GetLocalSpaceIterator()
