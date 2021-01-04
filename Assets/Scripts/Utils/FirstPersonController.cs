@@ -47,7 +47,7 @@ namespace Utils
 			this.characterController.transform.localEulerAngles = new Vector3(0, this.Yaw, 0);
 			this.cameraTransform.localEulerAngles = new Vector3(-this.Pitch, 0, 0);
 
-			this.characterController.Move(movementInput * this.movementSpeed * Time.deltaTime);
+			this.characterController.Move(movementInput * this.movementSpeed * Time.deltaTime * (Input.GetButton("Fire2") ? 5 : 1));
 		}
 	}
 }
