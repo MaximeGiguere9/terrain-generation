@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace VoxelWorld.Chunks
@@ -26,7 +25,7 @@ namespace VoxelWorld.Chunks
 		/// (0, 1)
 		/// </summary>
 		public static readonly Neighbor South = new Neighbor(3, Vector2Int.up);
-		public static IEnumerable<Neighbor> All = new[] { East, North, West, South };
+		public static Neighbor[] All = { East, North, West, South };
 
 		public static Neighbor Opposite(Neighbor value)
 		{

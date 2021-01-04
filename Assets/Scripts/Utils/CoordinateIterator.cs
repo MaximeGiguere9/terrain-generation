@@ -31,6 +31,10 @@ namespace Utils
 		/// </summary>
 		public int Volume { get; }
 
+		private int[] currentArr;
+		private readonly int[] offsetArr;
+		private readonly int[] targetArr;
+
 		public CoordinateIterator(Vector3Int size, Vector3Int offset)
 		{
 			if(size.x <= 0 || size.y <= 0 || size.z <= 0)
@@ -40,6 +44,10 @@ namespace Utils
 			this.offset = offset;
 			this.target = this.offset + this.size - Vector3Int.one;
 			this.Volume = this.size.x * this.size.y * this.size.z;
+
+			this.offsetArr = new[] { this.offset.x, this.offset.y, this.offset.z };
+			this.targetArr = new[] { this.target.x, this.target.y, this.target.z };
+
 			Reset();
 		}
 
@@ -48,11 +56,12 @@ namespace Utils
 			//place pointer before first element
 			this.current = new Vector3Int(this.offset.x - 1, this.offset.y, this.offset.z);
 			this.Index = -1;
+			this.currentArr = new[] {this.offset.x - 1, this.offset.y, this.offset.z};
 		}
 
 		public bool MoveNext()
 		{
-			if (this.current.x < this.target.x)
+			/*if (this.current.x < this.target.x)
 			{
 				//move first left to right
 				this.current.x++;
@@ -69,6 +78,39 @@ namespace Utils
 				this.current.y++;
 				this.current.x = this.offset.x;
 				this.current.z = this.offset.z;
+			}
+			else
+			{
+				//end
+				return false;
+			}*/
+
+			if (this.currentArr[0] < this.targetArr[0])
+			{
+				//move first left to right
+				this.currentArr[0]++;
+
+				this.current.x = this.currentArr[0];
+			}
+			else if (this.currentArr[2] < this.targetArr[2])
+			{
+				//if line is done, start the next one back to front
+				this.currentArr[2]++;
+				this.currentArr[0] = this.offsetArr[0];
+
+				this.current.x = this.currentArr[0];
+				this.current.z = this.currentArr[2];
+			}
+			else if (this.currentArr[1] < this.targetArr[1])
+			{
+				//if layer is done start the next one down to up
+				this.currentArr[1]++;
+				this.currentArr[0] = this.offsetArr[0];
+				this.currentArr[2] = this.offsetArr[2];
+
+				this.current.x = this.currentArr[0];
+				this.current.y = this.currentArr[1];
+				this.current.z = this.currentArr[2];
 			}
 			else
 			{

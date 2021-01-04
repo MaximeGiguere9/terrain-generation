@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 namespace VoxelWorld.Chunks
 {
@@ -8,6 +9,8 @@ namespace VoxelWorld.Chunks
 		[SerializeField] private MeshCollider meshCollider;
 
 		private SubChunk subChunk;
+
+		private bool shouldUpdateMesh;
 
 		public void SetSubChunk(SubChunk subChunk)
 		{
@@ -20,11 +23,23 @@ namespace VoxelWorld.Chunks
 
 		private void OnMeshInvalidated()
 		{
-			Mesh mesh = this.subChunk.GetMesh();
-			if (this.meshFilter.mesh == mesh) return;
-			this.meshFilter.mesh = mesh;
-			this.meshCollider.sharedMesh = this.meshFilter.sharedMesh;
-			this.gameObject.SetActive(mesh.vertexCount > 0);
+			this.shouldUpdateMesh = true;
+		}
+
+		private void Update()
+		{
+			if (this.shouldUpdateMesh)
+			{
+				Mesh mesh = this.subChunk.GetMesh();
+				if (this.meshFilter.mesh != mesh)
+				{
+					this.meshFilter.mesh = mesh;
+					this.meshCollider.sharedMesh = this.meshFilter.sharedMesh;
+					this.gameObject.SetActive(mesh.vertexCount > 0);
+				}
+
+				this.shouldUpdateMesh = false;
+			}
 		}
 
 		public void Destroy()
