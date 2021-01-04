@@ -8,6 +8,7 @@ namespace VoxelWorld.Generators.Biomes
 	{
 		private ITerrainGenerator plainsBiomeGenerator;
 		private ITerrainGenerator plateauBiomeGenerator;
+		private ITerrainGenerator snowyBiomeGenerator;
 
 		public override void Initialize()
 		{
@@ -18,6 +19,9 @@ namespace VoxelWorld.Generators.Biomes
 
 			this.plateauBiomeGenerator = new PlateauBiomeTerrainGenerator();
 			this.plateauBiomeGenerator.Initialize();
+
+			this.snowyBiomeGenerator = new SnowyBiomeTerrainGenerator();
+			this.snowyBiomeGenerator.Initialize();
 		}
 
 		public override void Generate(ref Chunk chunk, CoordinateIterator iterator)
@@ -32,7 +36,15 @@ namespace VoxelWorld.Generators.Biomes
 
 				CoordinateIterator itr = new CoordinateIterator(Vector3Int.one, pos);
 
-				ITerrainGenerator selectedBiome = noise > 0.5f ? this.plateauBiomeGenerator : this.plainsBiomeGenerator;
+				ITerrainGenerator selectedBiome;
+
+				if (noise > 0.5f)
+					selectedBiome = this.plateauBiomeGenerator;
+				else if (noise < 0.4f)
+					selectedBiome = this.snowyBiomeGenerator;
+				else
+					selectedBiome = this.plainsBiomeGenerator;
+
 
 				selectedBiome.Generate(ref chunk, itr);
 			}
