@@ -18,7 +18,16 @@ namespace VoxelWorld.Chunks
 
 		private readonly BlockService blockService;
 
-		private Mesh cachedMesh;
+		private bool meshInvalidated;
+
+		private Vector3Int positionBuffer;
+		private Vector3[] faceVerticesArrayBuffer;
+		private Vector2[] faceUVsArrayBuffer;
+		private readonly Mesh meshBuffer;
+		private readonly List<Vector3> verticesBuffer;
+		private readonly List<int> trianglesBuffer;
+		private readonly List<Vector2> uvsBuffer;
+		private readonly CoordinateIterator itrBuffer;
 
 		public SubChunk(in Chunk chunk, byte subdivisionIndex)
 		{
@@ -32,6 +41,19 @@ namespace VoxelWorld.Chunks
 
 			this.size = chunk.GetSize();
 			this.size.y /= chunk.GetSubdivisionCount();
+
+
+			this.positionBuffer = new Vector3Int();
+			this.faceVerticesArrayBuffer = this.blockService.GetFaceVerticesArrayBuffer();
+			this.faceUVsArrayBuffer = this.blockService.GetFaceUVsArrayBuffer();
+
+			this.meshBuffer = new Mesh();
+
+			this.verticesBuffer = new List<Vector3>(5000);
+			this.trianglesBuffer = new List<int>(5000);
+			this.uvsBuffer = new List<Vector2>(5000);
+
+			this.itrBuffer = GetLocalSpaceIterator();
 		}
 
 		public Chunk GetChunk() => this.chunk;
@@ -51,96 +73,111 @@ namespace VoxelWorld.Chunks
 
 		public void InvalidateMesh()
 		{
-			this.cachedMesh = null;
+			this.meshInvalidated = true;
 			OnMeshInvalidated?.Invoke();
 		}
 
 		public Mesh GetMesh()
 		{
-			if (this.cachedMesh == null)
-				this.cachedMesh = GenerateMesh();
-			return this.cachedMesh;
+			if (this.meshInvalidated)
+				GenerateMesh();
+			return this.meshBuffer;
 		}
 
-		private Mesh GenerateMesh()
+		private void GenerateMesh()
 		{
-			Mesh mesh = new Mesh();
-
-			List<Vector3> vertices = new List<Vector3>(10000);
-			List<int> triangles = new List<int>(10000);
-			List<Vector2> uvs = new List<Vector2>(10000);
-
-			CoordinateIterator itr = GetLocalSpaceIterator();
+			
+			this.meshBuffer.Clear();
+			this.verticesBuffer.Clear();
+			this.trianglesBuffer.Clear();
+			this.uvsBuffer.Clear();
 
 			var faces = this.blockService.GetFaceOrder();
 			var faceTris = this.blockService.GetFaceTriangleOrder();
 
-			foreach (Vector3Int pos in itr)
+			for (int y = itrBuffer.offset.y; y <= itrBuffer.target.y; y++)
 			{
-				byte block = this.chunk.GetBlockAtLocalPosition(pos);
-				if (block == 0) continue;
+				positionBuffer.y = y;
 
-				BlockModel blockModel = this.blockService.GetBlockModel(block);
-
-				for (int i = 0; i < faces.Length; i++)
+				for (int z = itrBuffer.offset.z; z <= itrBuffer.target.z; z++)
 				{
-					Vector3Int neighborPos = pos + faces[i];
-					Chunk neighborChunk = this.chunk;
+					positionBuffer.z = z;
 
-					if (neighborPos.x < 0)
-						neighborChunk = this.chunk.GetNeighbor(Neighbor.West);
-					else if (neighborPos.x >= this.chunk.GetSize().x)
-						neighborChunk = this.chunk.GetNeighbor(Neighbor.East);
-					else if (neighborPos.z < 0)
-						neighborChunk = this.chunk.GetNeighbor(Neighbor.North);
-					else if (neighborPos.z >= this.chunk.GetSize().z)
-						neighborChunk = this.chunk.GetNeighbor(Neighbor.South);
-
-					byte? neighborBlock = null;
-
-					if (neighborPos.y >= 0 && neighborPos.y < this.chunk.GetSize().y)
+					for (int x = itrBuffer.offset.x; x <= itrBuffer.target.x; x++)
 					{
-						if (neighborChunk == this.chunk)
+						positionBuffer.x = x;
+
+						byte block = this.chunk.GetBlockAtLocalPosition(in x, in y, in z);
+						if (block == 0) continue;
+
+						BlockModel blockModel = this.blockService.GetBlockModel(block);
+
+						for (int i = 0; i < faces.Length; i++)
 						{
-							neighborBlock = this.chunk.GetBlockAtLocalPosition(neighborPos);
-						}
-						else if (neighborChunk != null)
-						{
-							Vector3Int neighborSize = neighborChunk.GetSize();
-							Vector3Int neighborBlockLocalPos = new Vector3Int(
-								MathUtils.Mod(neighborPos.x, neighborSize.x),
-								neighborPos.y,
-								MathUtils.Mod(neighborPos.z, neighborSize.z)
-							);
-							neighborBlock = neighborChunk.GetBlockAtLocalPosition(neighborBlockLocalPos);
+							int neighborPosX = x + faces[i].x;
+							int neighborPosY = y + faces[i].y;
+							int neighborPosZ = z + faces[i].z;
+							Chunk neighborChunk = this.chunk;
+
+							if (neighborPosX < 0)
+								neighborChunk = this.chunk.GetNeighbor(Neighbor.West);
+							else if (neighborPosX >= this.chunk.GetSize().x)
+								neighborChunk = this.chunk.GetNeighbor(Neighbor.East);
+							else if (neighborPosZ < 0)
+								neighborChunk = this.chunk.GetNeighbor(Neighbor.North);
+							else if (neighborPosZ >= this.chunk.GetSize().z)
+								neighborChunk = this.chunk.GetNeighbor(Neighbor.South);
+
+							byte? neighborBlock = null;
+
+							if (neighborPosY >= 0 && neighborPosY < this.chunk.GetSize().y)
+							{
+								if (neighborChunk == this.chunk)
+								{
+									neighborBlock = this.chunk.GetBlockAtLocalPosition(neighborPosX, neighborPosY, neighborPosZ);
+								}
+								else if (neighborChunk != null)
+								{
+									Vector3Int neighborSize = neighborChunk.GetSize();
+									neighborBlock = neighborChunk.GetBlockAtLocalPosition(
+										MathUtils.Mod(neighborPosX, neighborSize.x),
+										neighborPosY,
+										MathUtils.Mod(neighborPosZ, neighborSize.z)
+									);
+								}
+							}
+
+							if (neighborBlock.HasValue && neighborBlock.Value > 0)
+							{
+								BlockModel neighborBlockModel = this.blockService.GetBlockModel(neighborBlock.Value);
+
+								if (blockModel == null || neighborBlockModel == null)
+									throw new InvalidOperationException("missing block model(s)");
+
+								bool isFaceVisible = neighborBlockModel.Transparent && !(block == neighborBlock.Value && blockModel.HideConnectingFaces);
+
+								if (!isFaceVisible) continue;
+							}
+
+							this.blockService.GetFaceVertices(positionBuffer, i, ref faceVerticesArrayBuffer);
+							verticesBuffer.AddRange(faceVerticesArrayBuffer);
+							this.blockService.GetFaceUVs(block, i, ref faceUVsArrayBuffer);
+							uvsBuffer.AddRange(faceUVsArrayBuffer);
+
+							foreach (byte id in faceTris)
+								trianglesBuffer.Add(verticesBuffer.Count - 1 - id);
 						}
 					}
-
-					if (neighborBlock.HasValue && neighborBlock.Value > 0)
-					{
-						BlockModel neighborBlockModel = this.blockService.GetBlockModel(neighborBlock.Value);
-
-						if (blockModel == null || neighborBlockModel == null)
-							throw new InvalidOperationException("missing block model(s)");
-
-						bool isFaceVisible = neighborBlockModel.Transparent && !(block == neighborBlock.Value && blockModel.HideConnectingFaces);
-
-						if (!isFaceVisible) continue;
-					}
-
-					vertices.AddRange(this.blockService.GetFaceVertices(pos, i));
-					uvs.AddRange(this.blockService.GetFaceUVs(block, i));
-					triangles.AddRange(faceTris.Select(id => vertices.Count - 1 - id));
 				}
 			}
 
-			mesh.vertices = vertices.ToArray();
-			mesh.triangles = triangles.ToArray();
-			mesh.uv = uvs.ToArray();
-			mesh.RecalculateNormals();
-			mesh.RecalculateTangents();
+			meshBuffer.vertices = verticesBuffer.ToArray();
+			meshBuffer.triangles = trianglesBuffer.ToArray();
+			meshBuffer.uv = uvsBuffer.ToArray();
+			meshBuffer.RecalculateNormals();
+			meshBuffer.RecalculateTangents();
 
-			return mesh;
+			this.meshInvalidated = false;
 		}
 	}
 }

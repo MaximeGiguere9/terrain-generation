@@ -64,7 +64,7 @@ namespace VoxelWorld.Blocks
 		private static BlockService _instance;
 		public static BlockService Instance => _instance ?? (_instance = new BlockService());
 
-		private static Dictionary<byte, BlockModel> _blocks;
+		private static BlockModel[] _blocks;
 
 		private BlockService()
 		{
@@ -77,7 +77,12 @@ namespace VoxelWorld.Blocks
 
 			TextAsset res = Resources.Load(path) as TextAsset;
 			BlocksConfig config = JsonUtility.FromJson<BlocksConfig>(res.text);
-			_blocks = config.Blocks.ToDictionary(b => b.Id, b => b);
+
+			_blocks = new BlockModel[config.Blocks.Max(b => b.Id) + 1];
+			foreach (var block in config.Blocks)
+			{
+				_blocks[block.Id] = block;
+			}
 		}
 
 		public Vector3Int[] GetVertexOrder() => VertexOrder;
@@ -111,6 +116,22 @@ namespace VoxelWorld.Blocks
 			};
 		}
 
+		public Vector3[] GetFaceVerticesArrayBuffer()
+		{
+			return new Vector3[4];
+		}
+
+		public void GetFaceVertices(in Vector3 worldPosition, in int faceIndex, ref Vector3[] arrayBuffer)
+		{
+			var verts = VertexOrder;
+			var faceVerts = FaceVertexOrder;
+
+			arrayBuffer[0] = worldPosition + verts[faceVerts[faceIndex][0]];
+			arrayBuffer[1] = worldPosition + verts[faceVerts[faceIndex][1]];
+			arrayBuffer[2] = worldPosition + verts[faceVerts[faceIndex][2]];
+			arrayBuffer[3] = worldPosition + verts[faceVerts[faceIndex][3]];
+		}
+
 		/// <summary>
 		/// Get the 4 uv coordinates of a block face
 		/// </summary>
@@ -131,10 +152,40 @@ namespace VoxelWorld.Blocks
 			};
 		}
 
+		public Vector2[] GetFaceUVsArrayBuffer()
+		{
+			return new[]
+			{
+				new Vector2(),
+				new Vector2(),
+				new Vector2(),
+				new Vector2()
+			};
+		}
+
+		public void GetFaceUVs(byte blockId, int faceIndex, ref Vector2[] arrayBuffer)
+		{
+			int ti = _blocks[blockId].TextureIndexes[faceIndex];
+			int x = ti % 16;
+			int y = ti / 16;
+
+			arrayBuffer[0].x = x / 16f;
+			arrayBuffer[0].y = y / 16f;
+
+			arrayBuffer[1].x = (x + 1) / 16f;
+			arrayBuffer[1].y = y / 16f;
+
+			arrayBuffer[2].x = (x + 1) / 16f;
+			arrayBuffer[2].y = (y + 1) / 16f;
+
+			arrayBuffer[3].x = x / 16f;
+			arrayBuffer[3].y = (y + 1) / 16f;
+		}
+
 		[CanBeNull]
 		public BlockModel GetBlockModel(byte blockId)
 		{
-			return _blocks.TryGetValue(blockId, out BlockModel value) ? value : null;
+			return _blocks[blockId];
 		}
 	}
 }

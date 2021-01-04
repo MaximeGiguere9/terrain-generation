@@ -24,6 +24,8 @@ namespace VoxelWorld.Chunks
 
 		private SubChunk[] subChunks;
 
+		private int[] sizeArr;
+
 		public Chunk(Vector3Int size, byte subdivisions)
 		{
 			this.size = size;
@@ -41,6 +43,7 @@ namespace VoxelWorld.Chunks
 				this.subChunks[i] = new SubChunk(this, i);
 			}
 
+			this.sizeArr = new[] {this.size.x, this.size.y, this.size.z};
 		}
 
 		public Vector3Int GetSize()
@@ -97,6 +100,11 @@ namespace VoxelWorld.Chunks
 			return this.blocks[offset];
 		}
 
+		public byte GetBlockAtLocalPosition(in int x, in int y, in int z)
+		{
+			return this.blocks[y * this.sizeArr[0] * this.sizeArr[2] + z * this.sizeArr[0] + x];
+		}
+
 		public void SetBlockAtLocalPosition(in Vector3Int position, byte blockId)
 		{
 			int offset = GetOffset(in position, in this.size);
@@ -118,12 +126,12 @@ namespace VoxelWorld.Chunks
 		}
 
 		[CanBeNull]
-		public Chunk GetNeighbor(Neighbor neighborPos)
+		public Chunk GetNeighbor(in Neighbor neighborPos)
 		{
 			return this.neighbors.TryGetValue(neighborPos, out Chunk chunk) ? chunk : null;
 		}
 
-		public void SetNeighbor(Neighbor neighborPos, Chunk neighborChunk)
+		public void SetNeighbor(in Neighbor neighborPos, in Chunk neighborChunk)
 		{
 			this.neighbors[neighborPos] = neighborChunk;
 		}
