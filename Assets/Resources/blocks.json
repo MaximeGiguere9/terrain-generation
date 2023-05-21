@@ -5,85 +5,97 @@
 			"Id": 1,
 			"Name": "stone",
 			"TextureIndexes": [ 241, 241, 241, 241, 241, 241 ],
-			"Transparent": false,
-			"HideConnectingFaces": false
+			"RenderType": 0,
+			"HideConnectingFaces": false,
+			"Solid": true
 		},
 		{
 			"Id": 2,
 			"Name": "bedrock",
 			"TextureIndexes": [ 225, 225, 225, 225, 225, 225 ],
-			"Transparent": false,
-			"HideConnectingFaces": false
+			"RenderType": 0,
+			"HideConnectingFaces": false,
+			"Solid": true
 		},
 		{
 			"Id": 3,
 			"Name": "dirt",
 			"TextureIndexes": [ 242, 242, 242, 242, 242, 242 ],
-			"Transparent": false,
-			"HideConnectingFaces": false
+			"RenderType": 0,
+			"HideConnectingFaces": false,
+			"Solid": true
 		},
 		{
 			"Id": 4,
 			"Name": "grass",
 			"TextureIndexes": [ 243, 243, 240, 242, 243, 243 ],
-			"Transparent": false,
-			"HideConnectingFaces": false
+			"RenderType": 0,
+			"HideConnectingFaces": false,
+			"Solid": true
 		},
 		{
 			"Id": 5,
 			"Name": "leaves",
 			"TextureIndexes": [ 196, 196, 196, 196, 196, 196 ],
-			"Transparent": true,
-			"HideConnectingFaces": false
+			"RenderType": 1,
+			"HideConnectingFaces": false,
+			"Solid": false
 		},
 		{
 			"Id": 6,
 			"Name": "brick",
 			"TextureIndexes": [ 247, 247, 247, 247, 247, 247 ],
-			"Transparent": false,
-			"HideConnectingFaces": false
+			"RenderType": 0,
+			"HideConnectingFaces": false,
+			"Solid": true
 		},
 		{
 			"Id": 7,
 			"Name": "water",
 			"TextureIndexes": [ 61, 61, 61, 61, 61, 61 ],
-			"Transparent": true,
-			"HideConnectingFaces": true
+			"RenderType": 2,
+			"HideConnectingFaces": true,
+			"Solid": false
 		},
 		{
 			"Id": 8,
 			"Name": "snow",
 			"TextureIndexes": [ 178, 178, 178, 178, 178, 178 ],
-			"Transparent": false,
-			"HideConnectingFaces": false
+			"RenderType": 0,
+			"HideConnectingFaces": false,
+			"Solid": true
 		},
 		{
 			"Id": 9,
 			"Name": "sand",
 			"TextureIndexes": [ 226, 226, 226, 226, 226, 226 ],
-			"Transparent": false,
-			"HideConnectingFaces": false
+			"RenderType": 0,
+			"HideConnectingFaces": false,
+			"Solid": true
 		},
 		{
 			"Id": 10,
 			"Name": "wood",
 			"TextureIndexes": [ 228, 228, 229, 229, 228, 228 ],
-			"Transparent": false,
-			"HideConnectingFaces": false
+			"RenderType": 0,
+			"HideConnectingFaces": false,
+			"Solid": true
 		},
 		{
 			"Id": 11,
 			"Name": "ice",
 			"TextureIndexes": [ 179, 179, 179, 179, 179, 179 ],
-			"Transparent": true,
-			"HideConnectingFaces": true
+			"RenderType": 2,
+			"HideConnectingFaces": true,
+			"Solid": true
 		},
 		{
 			"Id": 12,
 			"Name": "cactus",
 			"TextureIndexes": [ 182, 182, 181, 183, 182, 182 ],
-			"Transparent": false,
-			"HideConnectingFaces": false
+			"RenderType": 0,
+			"HideConnectingFaces": false,
+			"Solid": true
 		}
 	]
 }

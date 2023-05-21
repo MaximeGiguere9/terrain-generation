@@ -5,6 +5,8 @@
 		Caverns,
 		AllBiomes,
 		PlainsBiome,
-		PlateauBiome
+		PlateauBiome,
+		SnowyBiome,
+		OceanBiome
 	}
 }

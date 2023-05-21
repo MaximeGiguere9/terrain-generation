@@ -22,6 +22,12 @@ namespace VoxelWorld.Generators
 				case TerrainGeneratorType.PlateauBiome:
 					terrainGenerator = new PlateauBiomeTerrainGenerator();
 					break;
+				case TerrainGeneratorType.SnowyBiome:
+					terrainGenerator = new PlateauBiomeTerrainGenerator();
+					break;
+				case TerrainGeneratorType.OceanBiome:
+					terrainGenerator = new OceanBiomeTerrainGenerator();
+					break;
 				default:
 					throw new InvalidOperationException();
 			}

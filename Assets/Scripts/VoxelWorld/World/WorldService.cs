@@ -122,13 +122,13 @@ namespace VoxelWorld.World
 
 				foreach (var subChunk in neighborChunk.GetSubChunks())
 				{
-					subChunk.InvalidateMesh();
+					subChunk.GetRenderer().InvalidateMesh();
 				}
 			}
 
 			foreach (var subChunk in newChunk.GetSubChunks())
 			{
-				subChunk.InvalidateMesh();
+				subChunk.GetRenderer().InvalidateMesh();
 			}
 
 			/*CoordinateIterator itr = new CoordinateIterator(new Vector3Int(16, 48, 16), Vector3Int.zero);
@@ -223,7 +223,7 @@ namespace VoxelWorld.World
 				}
 			}
 
-			foreach (SubChunk subChunk in subChunksToInvalidate) subChunk.InvalidateMesh();
+			foreach (SubChunk subChunk in subChunksToInvalidate) subChunk.GetRenderer().InvalidateMesh();
 		}
 
 		public byte? GetBlockAt(in Vector3Int position)
