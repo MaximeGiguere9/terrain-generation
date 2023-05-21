@@ -77,6 +77,13 @@
 			"TextureIndexes": [ 179, 179, 179, 179, 179, 179 ],
 			"Transparent": true,
 			"HideConnectingFaces": true
+		},
+		{
+			"Id": 12,
+			"Name": "cactus",
+			"TextureIndexes": [ 182, 182, 181, 183, 182, 182 ],
+			"Transparent": false,
+			"HideConnectingFaces": false
 		}
 	]
 }

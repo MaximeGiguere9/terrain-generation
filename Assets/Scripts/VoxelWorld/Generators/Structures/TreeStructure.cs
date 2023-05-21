@@ -4,7 +4,7 @@ using Utils;
 
 namespace VoxelWorld.Generators.Structures
 {
-	public class TreeStructure
+	public class TreeStructure : IStructure
 	{
 		private const int LEAVES_RADIUS = 2;
 
