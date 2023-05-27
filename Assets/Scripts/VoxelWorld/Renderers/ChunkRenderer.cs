@@ -147,14 +147,14 @@ namespace VoxelWorld.Renderers
 							this.blockService.GetFaceVertices(x, y, z, i, ref faceVerticesArrayBuffer);
 							activeMeshBuffer.AddVertices(faceVerticesArrayBuffer);
 
+							this.blockService.GetFaceUVs(block, i, ref faceUVsArrayBuffer);
+							activeMeshBuffer.AddUVs(faceUVsArrayBuffer);
+
 							activeMeshBuffer.GetVertexCount(out int activeMeshBufferVertexCount);
 							for (int j = 0; j < BlockService.FaceTriangleOrder.Length; j++)
 							{
 								activeMeshBuffer.AddTriangle(activeMeshBufferVertexCount - 1 - BlockService.FaceTriangleOrder[j]);
 							}
-
-							this.blockService.GetFaceUVs(block, i, ref faceUVsArrayBuffer);
-							activeMeshBuffer.AddUVs(faceUVsArrayBuffer);
 
 							if (blockModelBuffer.Solid)
 							{
@@ -165,6 +165,20 @@ namespace VoxelWorld.Renderers
 								{
 									collisionMeshBuffer.AddTriangle(collisionMeshBufferVertexCount - 1 - BlockService.FaceTriangleOrder[j]);
 								}
+							} 
+							else
+							{
+								// non solid blocks are double-sided
+								activeMeshBuffer.AddVertices(faceVerticesArrayBuffer);
+
+								activeMeshBuffer.AddUVs(faceUVsArrayBuffer);
+
+								activeMeshBuffer.GetVertexCount(out activeMeshBufferVertexCount);
+								for (int j = BlockService.FaceTriangleOrder.Length - 1; j >= 0; j--)
+								{
+									activeMeshBuffer.AddTriangle(activeMeshBufferVertexCount - 1 - BlockService.FaceTriangleOrder[j]);
+								}
+
 							}
 						}
 					}
