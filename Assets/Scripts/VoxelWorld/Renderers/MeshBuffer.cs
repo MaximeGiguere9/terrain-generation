@@ -62,6 +62,11 @@ namespace VoxelWorld.Renderers
 			this.trianglesBuffer.AddRange(tris);
 		}
 
+		public void AddTriangle(in int tri)
+		{
+			this.trianglesBuffer.Add(tri);
+		}
+
 		public void AddUVs(in IEnumerable<Vector2> uvs)
 		{
 			this.uvsBuffer.AddRange(uvs);
