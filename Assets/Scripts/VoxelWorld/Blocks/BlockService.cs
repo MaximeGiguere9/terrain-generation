@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using JetBrains.Annotations;
+﻿using System.Linq;
 using UnityEngine;
-using Utils;
 
 namespace VoxelWorld.Blocks
 {
-	public class BlockService : IBlockShapeProvider
+	public class BlockService : IBlockService
 	{
 		#region Block Geometry Order
 
@@ -223,6 +220,11 @@ namespace VoxelWorld.Blocks
 		public BlockModel GetBlockModel(int blockId)
 		{
 			return _blocks[blockId];
+		}
+
+		public Vector3 GetBlockSize()
+		{
+			return Vector3Int.one;
 		}
 	}
 }

@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 
-namespace Utils
+namespace VoxelWorld.Blocks
 {
-	public interface IBlockShapeProvider
+	public interface IBlockService
 	{
+		Vector3 GetBlockSize();
 		Vector3Int[] GetVertexOrder();
 		Vector3Int[] GetFaceOrder();
 		byte[][] GetFaceVertexOrder();

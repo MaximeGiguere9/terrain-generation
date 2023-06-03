@@ -1,27 +1,29 @@
 ﻿using System;
 using UnityEngine;
+using VoxelWorld.Blocks;
 
-namespace Utils
+namespace VoxelWorld.Controls
 {
-	public static class BlockTargeter
+	public class RayBoxIntersectionTargeter : IBlockTargeter
 	{
-		public static readonly Vector3 BlockSize = Vector3Int.one;
-
-		public class HitPoint
-		{
-			public readonly Vector3Int Position;
-			public readonly Vector3Int Normal;
-
-			public HitPoint(Vector3Int position, Vector3Int normal)
-			{
-				this.Position = position;
-				this.Normal = normal;
-			}
-		}
-
 		public static bool DebugMode { get; set; } = false;
 
-		public static HitPoint Target(Vector3 position, Vector3 direction, float maxDistance, Func<Vector3Int, byte?> blockGetter, IBlockShapeProvider blockShapeProvider)
+		private readonly Func<Vector3Int, byte?> blockGetter;
+		private readonly IBlockService blockService;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="blockGetter">function that, when given a world position, returns a block at that position</param>
+		/// <param name="blockService">object that provides information about the shape of the blocks</param>
+		public RayBoxIntersectionTargeter(Func<Vector3Int, byte?> blockGetter, IBlockService blockService) 
+		{
+			this.blockGetter = blockGetter;
+			this.blockService = blockService;
+		}
+
+		public bool Target(in Vector3 position, in Vector3 direction, in float maxDistance, 
+			ref Vector3Int hitPosition, ref Vector3Int hitNormal)
 		{
 			/*
 			 * March through a series of ray-box intersections to find the closest block that can be targeted.
@@ -33,15 +35,16 @@ namespace Utils
 			DrawTargetRay(position, direction, maxDistance, Color.cyan);
 
 			Vector3Int blockPosition = Vector3Int.FloorToInt(position);
-			HitPoint hitPoint = null;
+
+			bool hit = false;
 
 			// (will exit when max distance is reached or block is found)
 			while (GetDistanceToBlock(position, blockPosition) <= maxDistance)
 			{
-				DrawBlockOutline(blockPosition, Color.blue, blockShapeProvider);
+				DrawBlockOutline(blockPosition, Color.blue, blockService);
 
 				//get normal of face through which ray exits block
-				Vector3Int? faceNormal = FindRayBoxExitNormal(position, direction, blockPosition, blockShapeProvider);
+				Vector3Int? faceNormal = FindRayBoxExitNormal(position, direction, blockPosition, blockService);
 
 				if (!faceNormal.HasValue)
 					throw new InvalidOperationException($"Ray from {position} in direction {direction} does not intersect box at {blockPosition}");
@@ -57,15 +60,17 @@ namespace Utils
 					continue;
 
 				//found block, collision normal is inverse of current block exit point (next block entry point)
-				hitPoint = new HitPoint(blockPosition, exitFace * -1);
+				hitPosition = blockPosition;
+				hitNormal = exitFace * -1;
 
-				DrawBlockOutline(hitPoint.Position, Color.cyan, blockShapeProvider);
+				DrawBlockOutline(hitPosition, Color.cyan, blockService);
 				DrawBlockNormal(blockPosition, exitFace * -1, Color.cyan);
 
+				hit = true;
 				break;
 			}
 
-			return hitPoint;
+			return hit;
 		}
 
 		/// <summary>
@@ -74,9 +79,9 @@ namespace Utils
 		/// <param name="origin"></param>
 		/// <param name="blockPosition"></param>
 		/// <returns></returns>
-		private static float GetDistanceToBlock(Vector3 origin, Vector3Int blockPosition)
+		private float GetDistanceToBlock(in Vector3 origin, in Vector3Int blockPosition)
 		{
-			return (blockPosition + BlockSize / 2f - origin).magnitude;
+			return (blockPosition + blockService.GetBlockSize() / 2f - origin).magnitude;
 		}
 
 		/// <summary>
@@ -86,7 +91,7 @@ namespace Utils
 		/// <param name="rayDirection"></param>
 		/// <param name="blockPosition"></param>
 		/// <returns>The normal of the face through which the ray exists the box, or null if the ray does not intersect the box</returns>
-		private static Vector3Int? FindRayBoxExitNormal(Vector3 rayOrigin, Vector3 rayDirection, Vector3Int blockPosition, IBlockShapeProvider blockShapeProvider)
+		private Vector3Int? FindRayBoxExitNormal(in Vector3 rayOrigin, in Vector3 rayDirection, in Vector3Int blockPosition, in IBlockService blockShapeProvider)
 		{
 			var faces = blockShapeProvider.GetFaceOrder();
 
@@ -129,7 +134,7 @@ namespace Utils
 		/// <param name="blockPosition"></param>
 		/// <param name="faceIndex"></param>
 		/// <returns></returns>
-		private static Vector3? GetRayFaceIntersection(Vector3 rayOrigin, Vector3 rayDirection, Vector3Int blockPosition, int faceIndex, IBlockShapeProvider blockShapeProvider)
+		private Vector3? GetRayFaceIntersection(in Vector3 rayOrigin, in Vector3 rayDirection, in Vector3Int blockPosition, in int faceIndex, in IBlockService blockShapeProvider)
 		{
 			var verts = blockShapeProvider.GetVertexOrder();
 			var faceVerts = blockShapeProvider.GetFaceVertexOrder();
@@ -164,7 +169,7 @@ namespace Utils
 		/// </summary>
 		/// <param name="position"></param>
 		/// <param name="color"></param>
-		private static void DrawBlockOutline(Vector3Int position, Color color, IBlockShapeProvider blockShapeProvider)
+		private void DrawBlockOutline(in Vector3Int position, in Color color, in IBlockService blockShapeProvider)
 		{
 			if (!DebugMode) return;
 
@@ -189,11 +194,11 @@ namespace Utils
 		/// <param name="position"></param>
 		/// <param name="faceNormal"></param>
 		/// <param name="color"></param>
-		private static void DrawBlockNormal(Vector3 position, Vector3 faceNormal, Color color)
+		private void DrawBlockNormal(in Vector3 position, in Vector3 faceNormal, in Color color)
 		{
 			if (!DebugMode) return;
 
-			Debug.DrawRay(position + BlockSize / 2, faceNormal / 2, color);
+			Debug.DrawRay(position + blockService.GetBlockSize() / 2, faceNormal / 2, color);
 		}
 
 		/// <summary>
@@ -203,7 +208,7 @@ namespace Utils
 		/// <param name="direction"></param>
 		/// <param name="maxDistance"></param>
 		/// <param name="color"></param>
-		private static void DrawTargetRay(Vector3 position, Vector3 direction, float maxDistance, Color color)
+		private void DrawTargetRay(in Vector3 position, in Vector3 direction, in float maxDistance, in Color color)
 		{
 			if (!DebugMode) return;
 
