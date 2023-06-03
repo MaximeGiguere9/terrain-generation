@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
 using Utils;
 using VoxelWorld.Blocks;
+using VoxelWorld.World;
 
-namespace VoxelWorld.World
+namespace VoxelWorld.Controls
 {
-	public class BlockTargeterBehaviour : MonoBehaviour
+	public class BlockTargetingController : MonoBehaviour
 	{
 		[SerializeField] private Transform cameraTransform;
 		[SerializeField] private float maxTargetRange = 4;
 		[SerializeField] private GameObject targetingIndicator;
+
+		private IFirstPersonInputHandler inputHandler = new UnityInputHandler();
 
 		private void Update()
 		{
@@ -33,12 +36,12 @@ namespace VoxelWorld.World
 			this.targetingIndicator.transform.LookAt(centerBlockPosition);
 			this.targetingIndicator.SetActive(true);
 
-			if (Input.GetButtonDown("Fire1"))
+			if (inputHandler.GetBreakBlock())
 			{
 				// break block
 				WorldService.Instance.SetBlockAt(targetHit.Position, 0);
 			}
-			else if (Input.GetButtonDown("Fire2"))
+			else if (inputHandler.GetPlaceBlock())
 			{
 				// place block
 				WorldService.Instance.SetBlockAt(targetHit.Position + targetHit.Normal, 6);
