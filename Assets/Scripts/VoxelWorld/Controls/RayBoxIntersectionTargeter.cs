@@ -9,17 +9,15 @@ namespace VoxelWorld.Controls
 		public static bool DebugMode { get; set; } = false;
 
 		private readonly Func<Vector3Int, byte?> blockGetter;
-		private readonly IBlockService blockService;
 
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="blockGetter">function that, when given a world position, returns a block at that position</param>
 		/// <param name="blockService">object that provides information about the shape of the blocks</param>
-		public RayBoxIntersectionTargeter(Func<Vector3Int, byte?> blockGetter, IBlockService blockService) 
+		public RayBoxIntersectionTargeter(Func<Vector3Int, byte?> blockGetter) 
 		{
 			this.blockGetter = blockGetter;
-			this.blockService = blockService;
 		}
 
 		public bool Target(in Vector3 position, in Vector3 direction, in float maxDistance, 
@@ -41,10 +39,10 @@ namespace VoxelWorld.Controls
 			// (will exit when max distance is reached or block is found)
 			while (GetDistanceToBlock(position, blockPosition) <= maxDistance)
 			{
-				DrawBlockOutline(blockPosition, Color.blue, blockService);
+				DrawBlockOutline(blockPosition, Color.blue);
 
 				//get normal of face through which ray exits block
-				Vector3Int? faceNormal = FindRayBoxExitNormal(position, direction, blockPosition, blockService);
+				Vector3Int? faceNormal = FindRayBoxExitNormal(position, direction, blockPosition);
 
 				if (!faceNormal.HasValue)
 					throw new InvalidOperationException($"Ray from {position} in direction {direction} does not intersect box at {blockPosition}");
@@ -63,7 +61,7 @@ namespace VoxelWorld.Controls
 				hitPosition = blockPosition;
 				hitNormal = exitFace * -1;
 
-				DrawBlockOutline(hitPosition, Color.cyan, blockService);
+				DrawBlockOutline(hitPosition, Color.cyan);
 				DrawBlockNormal(blockPosition, exitFace * -1, Color.cyan);
 
 				hit = true;
@@ -81,7 +79,7 @@ namespace VoxelWorld.Controls
 		/// <returns></returns>
 		private float GetDistanceToBlock(in Vector3 origin, in Vector3Int blockPosition)
 		{
-			return (blockPosition + blockService.GetBlockSize() / 2f - origin).magnitude;
+			return (blockPosition + Vector3.one / 2f - origin).magnitude;
 		}
 
 		/// <summary>
@@ -91,14 +89,14 @@ namespace VoxelWorld.Controls
 		/// <param name="rayDirection"></param>
 		/// <param name="blockPosition"></param>
 		/// <returns>The normal of the face through which the ray exists the box, or null if the ray does not intersect the box</returns>
-		private Vector3Int? FindRayBoxExitNormal(in Vector3 rayOrigin, in Vector3 rayDirection, in Vector3Int blockPosition, in IBlockService blockShapeProvider)
+		private Vector3Int? FindRayBoxExitNormal(in Vector3 rayOrigin, in Vector3 rayDirection, in Vector3Int blockPosition)
 		{
-			var faces = blockShapeProvider.GetFaceOrder();
+			var faces = BlockMeshModel.FaceNormals;
 
 			for (int i = 0; i < faces.Length; i++)
 			{
 				//find intersection for individual face plane
-				Vector3? intersection = GetRayFaceIntersection(rayOrigin, rayDirection, blockPosition, i, blockShapeProvider);
+				Vector3? intersection = GetRayFaceIntersection(rayOrigin, rayDirection, blockPosition, i);
 
 				//no intersection
 				if (!intersection.HasValue)
@@ -134,10 +132,10 @@ namespace VoxelWorld.Controls
 		/// <param name="blockPosition"></param>
 		/// <param name="faceIndex"></param>
 		/// <returns></returns>
-		private Vector3? GetRayFaceIntersection(in Vector3 rayOrigin, in Vector3 rayDirection, in Vector3Int blockPosition, in int faceIndex, in IBlockService blockShapeProvider)
+		private Vector3? GetRayFaceIntersection(in Vector3 rayOrigin, in Vector3 rayDirection, in Vector3Int blockPosition, in int faceIndex)
 		{
-			var verts = blockShapeProvider.GetVertexOrder();
-			var faceVerts = blockShapeProvider.GetFaceVertexOrder();
+			var verts = BlockMeshModel.Vertices;
+			var faceVerts = BlockMeshModel.FaceVertexOrder;
 
 			//face plane equation components
 			Vector3 u = verts[faceVerts[faceIndex][1]] -
@@ -169,12 +167,12 @@ namespace VoxelWorld.Controls
 		/// </summary>
 		/// <param name="position"></param>
 		/// <param name="color"></param>
-		private void DrawBlockOutline(in Vector3Int position, in Color color, in IBlockService blockShapeProvider)
+		private void DrawBlockOutline(in Vector3Int position, in Color color)
 		{
 			if (!DebugMode) return;
 
-			var verts = blockShapeProvider.GetVertexOrder();
-			var faceVerts = blockShapeProvider.GetFaceVertexOrder();
+			var verts = BlockMeshModel.Vertices;
+			var faceVerts = BlockMeshModel.FaceVertexOrder;
 
 			foreach (byte[] vertexIndexes in faceVerts)
 			{
@@ -198,7 +196,7 @@ namespace VoxelWorld.Controls
 		{
 			if (!DebugMode) return;
 
-			Debug.DrawRay(position + blockService.GetBlockSize() / 2, faceNormal / 2, color);
+			Debug.DrawRay(position + Vector3.one / 2f, faceNormal / 2f, color);
 		}
 
 		/// <summary>

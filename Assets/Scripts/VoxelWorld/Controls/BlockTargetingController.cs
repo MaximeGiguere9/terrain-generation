@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using VoxelWorld.Blocks;
 using VoxelWorld.World;
 
 namespace VoxelWorld.Controls
@@ -18,7 +17,7 @@ namespace VoxelWorld.Controls
 
 		private void Awake()
 		{
-			blockTargeter = new RayBoxIntersectionTargeter(pos => WorldService.Instance.GetBlockAt(pos), BlockService.Instance);
+			blockTargeter = new RayBoxIntersectionTargeter(pos => WorldService.Instance.GetBlockAt(pos));
 		}
 
 		private void Update()

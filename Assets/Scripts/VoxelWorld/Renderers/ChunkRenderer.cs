@@ -45,9 +45,8 @@ namespace VoxelWorld.Renderers
 			this.min = new[] { subChunkBlockPositionOffset.x, subChunkBlockPositionOffset.y, subChunkBlockPositionOffset.z };
 			this.max = new[] { subChunkBlockPositionOffset.x + subChunkSize.x, subChunkBlockPositionOffset.y + subChunkSize.y, subChunkBlockPositionOffset.z + subChunkSize.z };
 
-
-			this.faceVerticesArrayBuffer = this.blockService.GetFaceVerticesArrayBuffer();
-			this.faceUVsArrayBuffer = this.blockService.GetFaceUVsArrayBuffer();
+			this.faceVerticesArrayBuffer = BlockMeshModel.AllocateFaceVerticesArray();
+			this.faceUVsArrayBuffer = BlockMeshModel.AllocateFaceUVsArray();
 
 			this.cutoutMeshBuffer = new MeshBuffer();
 			this.transparentMeshBuffer = new MeshBuffer();
@@ -85,11 +84,11 @@ namespace VoxelWorld.Renderers
 						byte block = this.chunk.GetBlockAtLocalPosition(in x, in y, in z);
 						if (block == 0) continue;
 
-						for (int i = 0; i < BlockService.FaceOrder.Length; i++)
+						for (int i = 0; i < BlockMeshModel.FaceNormals.Length; i++)
 						{
-							int neighborPosX = x + BlockService.FaceOrderArr[i][0];
-							int neighborPosY = y + BlockService.FaceOrderArr[i][1];
-							int neighborPosZ = z + BlockService.FaceOrderArr[i][2];
+							int neighborPosX = x + BlockMeshModel.FaceNormals[i][0];
+							int neighborPosY = y + BlockMeshModel.FaceNormals[i][1];
+							int neighborPosZ = z + BlockMeshModel.FaceNormals[i][2];
 							Chunk neighborChunk = this.chunk;
 
 							int neighborBlock = -1;
@@ -144,16 +143,16 @@ namespace VoxelWorld.Renderers
 								? this.transparentMeshBuffer
 								: this.cutoutMeshBuffer;
 
-							this.blockService.GetFaceVertices(x, y, z, i, ref faceVerticesArrayBuffer);
+							BlockMeshModel.GetFaceVerticesInWorldSpace(x, y, z, i, ref faceVerticesArrayBuffer);
 							activeMeshBuffer.AddVertices(faceVerticesArrayBuffer);
 
-							this.blockService.GetFaceUVs(block, i, ref faceUVsArrayBuffer);
+							BlockMeshModel.GetFaceUVs(blockModelBuffer.TextureIndexes[i], ref faceUVsArrayBuffer);
 							activeMeshBuffer.AddUVs(faceUVsArrayBuffer);
 
 							activeMeshBuffer.GetVertexCount(out int activeMeshBufferVertexCount);
-							for (int j = 0; j < BlockService.FaceTriangleOrder.Length; j++)
+							for (int j = 0; j < BlockMeshModel.FaceTriangleOrder.Length; j++)
 							{
-								activeMeshBuffer.AddTriangle(activeMeshBufferVertexCount - 1 - BlockService.FaceTriangleOrder[j]);
+								activeMeshBuffer.AddTriangle(activeMeshBufferVertexCount - 1 - BlockMeshModel.FaceTriangleOrder[j]);
 							}
 
 							if (blockModelBuffer.Solid)
@@ -161,9 +160,9 @@ namespace VoxelWorld.Renderers
 								collisionMeshBuffer.AddVertices(faceVerticesArrayBuffer);
 
 								collisionMeshBuffer.GetVertexCount(out int collisionMeshBufferVertexCount);
-								for (int j = 0; j < BlockService.FaceTriangleOrder.Length; j++)
+								for (int j = 0; j < BlockMeshModel.FaceTriangleOrder.Length; j++)
 								{
-									collisionMeshBuffer.AddTriangle(collisionMeshBufferVertexCount - 1 - BlockService.FaceTriangleOrder[j]);
+									collisionMeshBuffer.AddTriangle(collisionMeshBufferVertexCount - 1 - BlockMeshModel.FaceTriangleOrder[j]);
 								}
 							} 
 							else
@@ -174,9 +173,9 @@ namespace VoxelWorld.Renderers
 								activeMeshBuffer.AddUVs(faceUVsArrayBuffer);
 
 								activeMeshBuffer.GetVertexCount(out activeMeshBufferVertexCount);
-								for (int j = BlockService.FaceTriangleOrder.Length - 1; j >= 0; j--)
+								for (int j = BlockMeshModel.FaceTriangleOrder.Length - 1; j >= 0; j--)
 								{
-									activeMeshBuffer.AddTriangle(activeMeshBufferVertexCount - 1 - BlockService.FaceTriangleOrder[j]);
+									activeMeshBuffer.AddTriangle(activeMeshBufferVertexCount - 1 - BlockMeshModel.FaceTriangleOrder[j]);
 								}
 
 							}
