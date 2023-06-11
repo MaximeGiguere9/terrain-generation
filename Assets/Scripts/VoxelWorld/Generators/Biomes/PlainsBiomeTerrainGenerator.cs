@@ -60,10 +60,16 @@ namespace VoxelWorld.Generators.Biomes
 					chunk.SetBlockAtLocalPosition(new Vector3Int(pos.x, y, pos.z), 7);
 				}
 
-				if ((pos.x + offset.x + chunk.GetSize().x / 2) % chunk.GetSize().x != 0 || 
-				    (pos.z + offset.z + chunk.GetSize().z / 2) % chunk.GetSize().z != 0 || 
-				    height < this.waterLevel)
+				// don't generate trees if they would end up underwater or across chunk boundaries
+				if (pos.x <= TreeStructure.LEAVES_RADIUS || pos.x >= chunk.GetSize().x - TreeStructure.LEAVES_RADIUS ||
+					pos.z <= TreeStructure.LEAVES_RADIUS || pos.z >= chunk.GetSize().z - TreeStructure.LEAVES_RADIUS ||
+					height < this.waterLevel)
 					continue;
+
+				if (this.rng.Next(1, 1000) < 975)
+				{
+					continue;
+				}
 
 				TreeStructure tree = new TreeStructure(new Vector3Int(pos.x + offset.x, height, pos.z + offset.z), Random.Range(3, 8));
 

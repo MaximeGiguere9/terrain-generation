@@ -6,7 +6,7 @@ namespace VoxelWorld.Generators.Structures
 {
 	public class TreeStructure : IStructure
 	{
-		private const int LEAVES_RADIUS = 2;
+		public static readonly int LEAVES_RADIUS = 2;
 
 		private readonly int height;
 		private readonly Vector3Int offset;

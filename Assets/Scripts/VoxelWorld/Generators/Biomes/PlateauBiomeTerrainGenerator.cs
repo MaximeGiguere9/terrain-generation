@@ -61,10 +61,13 @@ namespace VoxelWorld.Generators.Biomes
 					chunk.SetBlockAtWorldPosition(new Vector3Int(pos.x, y, pos.z), 7);
 				}
 
-				if ((pos.x + offset.x + chunk.GetSize().x / 2) % chunk.GetSize().x != 0 ||
-					(pos.z + offset.z + chunk.GetSize().z / 2) % chunk.GetSize().z != 0 ||
-					height < this.waterLevel)
+				if (height < this.waterLevel)
 					continue;
+
+				if (this.rng.Next(1, 1000) < 995)
+				{
+					continue;
+				}
 
 				CactusStructure cactus = new CactusStructure(new Vector3Int(pos.x + offset.x, height, pos.z + offset.z), Random.Range(1, 5));
 
