@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using UnityEngine;
 using Utils;
 
@@ -137,13 +136,11 @@ namespace VoxelWorld.Chunks
 			return this.subChunks[index];
 		}
 
-		[CanBeNull]
 		public Chunk GetNeighbor(in Neighbor neighborPos)
 		{
 			return this.neighbors.TryGetValue(neighborPos, out Chunk chunk) ? chunk : null;
 		}
 
-		[CanBeNull]
 		public Chunk GetNeighbor(in int neighborIndex)
 		{
 			return this.neighborsArr[neighborIndex];
