@@ -96,6 +96,14 @@
 			"RenderType": 0,
 			"HideConnectingFaces": false,
 			"Solid": true
+		},
+		{
+			"Id": 13,
+			"Name": "gravel",
+			"TextureIndexes": [ 227, 227, 227, 227, 227, 227 ],
+			"RenderType": 0,
+			"HideConnectingFaces": false,
+			"Solid": true
 		}
 	]
 }

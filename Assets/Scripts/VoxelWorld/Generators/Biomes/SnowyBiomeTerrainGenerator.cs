@@ -30,6 +30,7 @@ namespace VoxelWorld.Generators.Biomes
 				float variance = this.baselineHeight * noise;
 
 				int height = Mathf.FloorToInt((noise * 2 - 1) * variance + Mathf.Max(this.baselineHeight - variance, 0));
+				height = Mathf.FloorToInt(Mathf.Pow(height, 0.9f));
 
 				for (int y = 0; y < height; y++)
 				{

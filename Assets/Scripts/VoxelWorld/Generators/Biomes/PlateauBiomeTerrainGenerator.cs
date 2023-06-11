@@ -29,19 +29,29 @@ namespace VoxelWorld.Generators.Biomes
 					frequency *= lacunarity;
 				}
 
-				noise = Mathf.Round(noise * 20) / 20;
+				noise = Mathf.Round(noise * 20) / 20; // gives jagged look to terrain
 
 				float variance = this.baselineHeight * noise;
 
 				int height = Mathf.FloorToInt((noise * 2 - 1) * variance + Mathf.Max(this.baselineHeight - variance, 0));
+				height = Mathf.FloorToInt(Mathf.Pow(height, 0.9f));
 
 				for (int y = 0; y < height; y++)
 				{
 					byte blockId;
 
-					if (y == 0) blockId = 2;
-					else if (y > height - 5) blockId = 9;
-					else blockId = 1;
+					if (height >= this.waterLevel)
+					{
+						if (y == 0) blockId = 2;
+						else if (y > height - 5) blockId = 9;
+						else blockId = 1;
+					}
+					else
+					{
+						if (y == 0) blockId = 2;
+						else if (y > height - 5) blockId = 13;
+						else blockId = 1;
+					}
 
 					chunk.SetBlockAtWorldPosition(new Vector3Int(pos.x, y, pos.z), blockId);
 				}
