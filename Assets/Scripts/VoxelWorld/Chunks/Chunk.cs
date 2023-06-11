@@ -53,9 +53,9 @@ namespace VoxelWorld.Chunks
 
 		public int GetBlocksLength() => this.blocks.Length;
 
-		public Vector3Int GetSize()
+		public ref Vector3Int GetSize()
 		{
-			return this.size;
+			return ref this.size;
 		}
 
 		public byte GetSubdivisionCount()

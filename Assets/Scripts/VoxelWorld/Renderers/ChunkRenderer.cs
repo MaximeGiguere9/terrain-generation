@@ -10,26 +10,25 @@ namespace VoxelWorld.Renderers
 	{
 		public event Action OnMeshInvalidated;
 
-		private readonly Chunk chunk;
-
 		private readonly BlockService blockService;
 
-		private bool meshInvalidated;
+		private readonly Chunk chunk;
 
-		private Vector3[] faceVerticesArrayBuffer;
-		private Vector2[] faceUVsArrayBuffer;
-
-		private readonly int[] min;
-		private readonly int[] max;
-
-		private readonly int[] chunkSizeBuffer;
-
-		private BlockModel blockModelBuffer;
-		private BlockModel neighborBlockModelBuffer;
+		private readonly int[] chunkSize;
+		private readonly int[] minCoordinate;
+		private readonly int[] maxCoordinate;
 
 		private readonly MeshBuffer cutoutMeshBuffer;
 		private readonly MeshBuffer transparentMeshBuffer;
 		private readonly MeshBuffer collisionMeshBuffer;
+
+		private Vector3[] faceVerticesArrayBuffer;
+		private Vector2[] faceUVsArrayBuffer;
+
+		private BlockModel blockModelBuffer;
+		private BlockModel neighborBlockModelBuffer;
+
+		private bool meshInvalidated;
 
 		public ChunkRenderer(in Chunk chunk, byte subdivisionIndex)
 		{
@@ -42,17 +41,17 @@ namespace VoxelWorld.Renderers
 			Vector3Int subChunkSize = chunk.GetSize();
 			subChunkSize.y /= chunk.GetSubdivisionCount();
 
-			this.min = new[] { subChunkBlockPositionOffset.x, subChunkBlockPositionOffset.y, subChunkBlockPositionOffset.z };
-			this.max = new[] { subChunkBlockPositionOffset.x + subChunkSize.x, subChunkBlockPositionOffset.y + subChunkSize.y, subChunkBlockPositionOffset.z + subChunkSize.z };
+			this.chunkSize = new[] { this.chunk.GetSize().x, this.chunk.GetSize().y, this.chunk.GetSize().z };
 
-			this.faceVerticesArrayBuffer = BlockMeshModel.AllocateFaceVerticesArray();
-			this.faceUVsArrayBuffer = BlockMeshModel.AllocateFaceUVsArray();
+			this.minCoordinate = new[] { subChunkBlockPositionOffset.x, subChunkBlockPositionOffset.y, subChunkBlockPositionOffset.z };
+			this.maxCoordinate = new[] { subChunkBlockPositionOffset.x + subChunkSize.x, subChunkBlockPositionOffset.y + subChunkSize.y, subChunkBlockPositionOffset.z + subChunkSize.z };
 
 			this.cutoutMeshBuffer = new MeshBuffer();
 			this.transparentMeshBuffer = new MeshBuffer();
 			this.collisionMeshBuffer = new MeshBuffer();
 
-			this.chunkSizeBuffer = new[] { this.chunk.GetSize().x, this.chunk.GetSize().y, this.chunk.GetSize().z };
+			this.faceVerticesArrayBuffer = BlockMeshModel.AllocateFaceVerticesArray();
+			this.faceUVsArrayBuffer = BlockMeshModel.AllocateFaceUVsArray();
 		}
 
 		public void InvalidateMesh()
@@ -75,33 +74,34 @@ namespace VoxelWorld.Renderers
 			this.transparentMeshBuffer.Clear();
 			this.collisionMeshBuffer.Clear();
 
-			for (int y = this.min[1]; y < this.max[1]; y++)
+			// using three loops here is significantly more performant than using a coordinate iterator
+			for (int y = this.minCoordinate[1]; y < this.maxCoordinate[1]; y++)
 			{
-				for (int z = this.min[2]; z < this.max[2]; z++)
+				for (int z = this.minCoordinate[2]; z < this.maxCoordinate[2]; z++)
 				{
-					for (int x = this.min[0]; x < this.max[0]; x++)
+					for (int x = this.minCoordinate[0]; x < this.maxCoordinate[0]; x++)
 					{
 						byte block = this.chunk.GetBlockAtLocalPosition(in x, in y, in z);
 						if (block == 0) continue;
 
 						for (int i = 0; i < BlockMeshModel.FaceNormals.Length; i++)
 						{
-							int neighborPosX = x + BlockMeshModel.FaceNormals[i][0];
-							int neighborPosY = y + BlockMeshModel.FaceNormals[i][1];
-							int neighborPosZ = z + BlockMeshModel.FaceNormals[i][2];
+							int neighborPosX = x + BlockMeshModel.FaceNormals[i].x;
+							int neighborPosY = y + BlockMeshModel.FaceNormals[i].y;
+							int neighborPosZ = z + BlockMeshModel.FaceNormals[i].z;
 							Chunk neighborChunk = this.chunk;
 
 							int neighborBlock = -1;
 
-							if (neighborPosY >= 0 && neighborPosY < this.chunkSizeBuffer[1])
+							if (neighborPosY >= 0 && neighborPosY < this.chunkSize[1])
 							{
 								if (neighborPosX < 0)
 									neighborChunk = this.chunk.GetNeighbor(2);
-								else if (neighborPosX >= this.chunkSizeBuffer[0])
+								else if (neighborPosX >= this.chunkSize[0])
 									neighborChunk = this.chunk.GetNeighbor(0);
 								else if (neighborPosZ < 0)
 									neighborChunk = this.chunk.GetNeighbor(1);
-								else if (neighborPosZ >= this.chunkSizeBuffer[2])
+								else if (neighborPosZ >= this.chunkSize[2])
 									neighborChunk = this.chunk.GetNeighbor(3);
 
 								if (neighborChunk == this.chunk)
@@ -111,9 +111,9 @@ namespace VoxelWorld.Renderers
 								else if (neighborChunk != null)
 								{
 									neighborBlock = neighborChunk.GetBlockAtLocalPosition(
-										MathUtils.Mod(neighborPosX, this.chunkSizeBuffer[0]),
+										MathUtils.Mod(neighborPosX, this.chunkSize[0]),
 										neighborPosY,
-										MathUtils.Mod(neighborPosZ, this.chunkSizeBuffer[2])
+										MathUtils.Mod(neighborPosZ, this.chunkSize[2])
 									);
 								}
 							}
@@ -137,7 +137,7 @@ namespace VoxelWorld.Renderers
 								}
 							}
 
-							
+
 
 							MeshBuffer activeMeshBuffer = blockModelBuffer.RenderType == RenderType.Transparent
 								? this.transparentMeshBuffer
@@ -164,7 +164,7 @@ namespace VoxelWorld.Renderers
 								{
 									collisionMeshBuffer.AddTriangle(collisionMeshBufferVertexCount - 1 - BlockMeshModel.FaceTriangleOrder[j]);
 								}
-							} 
+							}
 							else
 							{
 								// non solid blocks are double-sided

@@ -5,8 +5,6 @@ namespace VoxelWorld.Renderers
 {
 	public class MeshBuffer
 	{
-		private static readonly int INITIAL_BUFFER_SIZE = 5000;
-
 		private readonly Mesh meshBuffer;
 		private readonly List<Vector3> verticesBuffer;
 		private readonly List<int> trianglesBuffer;
@@ -15,9 +13,9 @@ namespace VoxelWorld.Renderers
 		public MeshBuffer()
 		{
 			this.meshBuffer = new Mesh();
-			this.verticesBuffer = new List<Vector3>(INITIAL_BUFFER_SIZE);
-			this.trianglesBuffer = new List<int>(INITIAL_BUFFER_SIZE);
-			this.uvsBuffer = new List<Vector2>(INITIAL_BUFFER_SIZE);
+			this.verticesBuffer = new List<Vector3>();
+			this.trianglesBuffer = new List<int>();
+			this.uvsBuffer = new List<Vector2>();
 		}
 
 		public void Clear()
@@ -30,9 +28,9 @@ namespace VoxelWorld.Renderers
 
 		public void Rebuild()
 		{
-			this.meshBuffer.vertices = verticesBuffer.ToArray();
-			this.meshBuffer.triangles = trianglesBuffer.ToArray();
-			this.meshBuffer.uv = uvsBuffer.ToArray();
+			this.meshBuffer.SetVertices(verticesBuffer);
+			this.meshBuffer.SetTriangles(trianglesBuffer, 0);
+			this.meshBuffer.SetUVs(0, uvsBuffer);
 			this.meshBuffer.RecalculateNormals();
 			this.meshBuffer.RecalculateTangents();
 		}

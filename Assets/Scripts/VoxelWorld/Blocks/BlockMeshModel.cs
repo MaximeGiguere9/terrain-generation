@@ -89,21 +89,21 @@ namespace VoxelWorld.Blocks
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void GetFaceVerticesInWorldSpace(in int x, in int y, in int z, in int faceIndex, ref Vector3[] vertices)
 		{
-			vertices[0].x = x + Vertices[FaceVertexOrder[faceIndex][0]][0];
-			vertices[0].y = y + Vertices[FaceVertexOrder[faceIndex][0]][1];
-			vertices[0].z = z + Vertices[FaceVertexOrder[faceIndex][0]][2];
+			vertices[0].x = x + Vertices[FaceVertexOrder[faceIndex][0]].x;
+			vertices[0].y = y + Vertices[FaceVertexOrder[faceIndex][0]].y;
+			vertices[0].z = z + Vertices[FaceVertexOrder[faceIndex][0]].z;
 
-			vertices[1].x = x + Vertices[FaceVertexOrder[faceIndex][1]][0];
-			vertices[1].y = y + Vertices[FaceVertexOrder[faceIndex][1]][1];
-			vertices[1].z = z + Vertices[FaceVertexOrder[faceIndex][1]][2];
+			vertices[1].x = x + Vertices[FaceVertexOrder[faceIndex][1]].x;
+			vertices[1].y = y + Vertices[FaceVertexOrder[faceIndex][1]].y;
+			vertices[1].z = z + Vertices[FaceVertexOrder[faceIndex][1]].z;
 
-			vertices[2].x = x + Vertices[FaceVertexOrder[faceIndex][2]][0];
-			vertices[2].y = y + Vertices[FaceVertexOrder[faceIndex][2]][1];
-			vertices[2].z = z + Vertices[FaceVertexOrder[faceIndex][2]][2];
+			vertices[2].x = x + Vertices[FaceVertexOrder[faceIndex][2]].x;
+			vertices[2].y = y + Vertices[FaceVertexOrder[faceIndex][2]].y;
+			vertices[2].z = z + Vertices[FaceVertexOrder[faceIndex][2]].z;
 
-			vertices[3].x = x + Vertices[FaceVertexOrder[faceIndex][3]][0];
-			vertices[3].y = y + Vertices[FaceVertexOrder[faceIndex][3]][1];
-			vertices[3].z = z + Vertices[FaceVertexOrder[faceIndex][3]][2];
+			vertices[3].x = x + Vertices[FaceVertexOrder[faceIndex][3]].x;
+			vertices[3].y = y + Vertices[FaceVertexOrder[faceIndex][3]].y;
+			vertices[3].z = z + Vertices[FaceVertexOrder[faceIndex][3]].z;
 		}
 
 		/// <summary>
