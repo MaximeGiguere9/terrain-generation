@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Utils;
+using VoxelWorld.Utils;
 
 namespace VoxelWorld.Generators.Structures
 {

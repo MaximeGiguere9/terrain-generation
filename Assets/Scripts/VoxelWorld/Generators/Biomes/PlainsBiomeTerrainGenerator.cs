@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using Utils;
 using VoxelWorld.Chunks;
 using VoxelWorld.Generators.Structures;
+using VoxelWorld.Utils;
 
 namespace VoxelWorld.Generators.Biomes
 {

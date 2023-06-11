@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Utils;
 using VoxelWorld.Chunks;
 using VoxelWorld.Generators;
+using VoxelWorld.Utils;
 
 namespace VoxelWorld.World
 {

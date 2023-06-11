@@ -1,5 +1,5 @@
 using UnityEngine;
-using Utils;
+using VoxelWorld.Utils;
 
 namespace VoxelWorld.Chunks
 {

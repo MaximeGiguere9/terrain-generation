@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Utils
+namespace VoxelWorld.Utils
 {
 	/// <summary>
 	/// 1-loop shortcut to 3-loop x,y,z iteration.
@@ -17,9 +17,9 @@ namespace Utils
 
 		private Vector3Int current;
 
-		public Vector3Int Current => this.current;
+		public Vector3Int Current => current;
 
-		object IEnumerator.Current => this.current;
+		object IEnumerator.Current => current;
 
 		/// <summary>
 		/// 1d offset of the current position relative to the start of the iterator
@@ -33,48 +33,48 @@ namespace Utils
 
 		public CoordinateIterator(Vector3Int size, Vector3Int offset)
 		{
-			if(size.x <= 0 || size.y <= 0 || size.z <= 0)
+			if (size.x <= 0 || size.y <= 0 || size.z <= 0)
 				throw new ArgumentException("Size must be greater than 0");
 
 			this.size = size;
 			this.offset = offset;
-			this.target = this.offset + this.size - Vector3Int.one;
+			target = this.offset + this.size - Vector3Int.one;
 
-			this.current = new Vector3Int(this.offset.x - 1, this.offset.y, this.offset.z);
+			current = new Vector3Int(this.offset.x - 1, this.offset.y, this.offset.z);
 
-			this.Index = -1;
-			this.Volume = this.size.x * this.size.y * this.size.z;
+			Index = -1;
+			Volume = this.size.x * this.size.y * this.size.z;
 		}
 
 		public void Reset()
 		{
 			//place pointer before first element
-			this.Index = -1;
+			Index = -1;
 
-			this.current.x = this.offset.x - 1;
-			this.current.y = this.offset.y;
-			this.current.z = this.offset.z;
+			current.x = offset.x - 1;
+			current.y = offset.y;
+			current.z = offset.z;
 		}
 
 		public bool MoveNext()
 		{
-			if (this.current.x < this.target.x)
+			if (current.x < target.x)
 			{
 				//move first left to right
-				this.current.x++;
+				current.x++;
 			}
-			else if (this.current.z < this.target.z)
+			else if (current.z < target.z)
 			{
 				//if line is done, start the next one back to front
-				this.current.z++;
-				this.current.x = this.offset.x;
+				current.z++;
+				current.x = offset.x;
 			}
-			else if (this.current.y < this.target.y)
+			else if (current.y < target.y)
 			{
 				//if layer is done start the next one down to up
-				this.current.y++;
-				this.current.x = this.offset.x;
-				this.current.z = this.offset.z;
+				current.y++;
+				current.x = offset.x;
+				current.z = offset.z;
 			}
 			else
 			{
@@ -82,7 +82,7 @@ namespace Utils
 				return false;
 			}
 
-			this.Index++;
+			Index++;
 			return true;
 		}
 

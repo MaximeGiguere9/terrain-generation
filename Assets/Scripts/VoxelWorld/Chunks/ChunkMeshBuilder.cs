@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
-using Utils;
 using VoxelWorld.Blocks;
+using VoxelWorld.Utils;
 
 namespace VoxelWorld.Chunks
 {

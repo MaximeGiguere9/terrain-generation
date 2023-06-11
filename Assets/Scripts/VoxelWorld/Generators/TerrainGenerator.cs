@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
-using Utils;
 using VoxelWorld.Chunks;
+using VoxelWorld.Utils;
 
 namespace VoxelWorld.Generators
 {
