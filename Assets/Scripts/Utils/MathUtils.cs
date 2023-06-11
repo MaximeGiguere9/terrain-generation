@@ -3,7 +3,9 @@
 	public static class MathUtils
 	{
 		/// <summary>
-		/// "true" modulus operation (always in the interval [0, rhs] if rhs greater than 0 or [rhs, 0] if rhs lower than 0)
+		/// "true" modulus operation <br/>
+		/// Returns a value that is always in the interval [0, rhs[ if rhs > 0, or ]rhs, 0] if rhs < 0. <br/>
+		/// This differs from the default % operator (remainder), which returns a value in the ]-rhs, rhs[ interval.
 		/// </summary>
 		/// <param name="lhs"></param>
 		/// <param name="rhs"></param>

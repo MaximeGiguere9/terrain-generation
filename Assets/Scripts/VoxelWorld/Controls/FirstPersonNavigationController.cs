@@ -10,7 +10,7 @@ namespace VoxelWorld.Controls
 		[SerializeField] private float maxPitch = 80;
 		[SerializeField] private float movementSpeed = 10;
 
-		private IFirstPersonInputHandler inputHandler = new UnityInputHandler();
+		private readonly IFirstPersonInputHandler inputHandler = new UnityInputHandler();
 
 		private float pitch;
 		public float Pitch

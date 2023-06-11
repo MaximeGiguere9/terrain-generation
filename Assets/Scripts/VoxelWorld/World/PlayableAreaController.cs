@@ -30,10 +30,15 @@ namespace VoxelWorld.World
 
 			List<Vector2Int> newArea = iterator.Select(pos => new Vector2Int(pos.x, pos.z)).ToList();
 
-			this.world.LoadChunks(newArea.Where(c => !this.lastArea.Contains(c)));
 			this.world.UnloadChunks(this.lastArea.Where(c => !newArea.Contains(c)));
+			int chunksToLoad = this.world.PrepareChunkLoad(newArea.Where(c => !this.lastArea.Contains(c)));
 
 			this.lastArea = newArea;
+
+			if (chunksToLoad > 0) 
+			{ 
+				StartCoroutine(this.world.GetChunkLoadRoutine()); 
+			}
 
 			Vector3Int start = new Vector3Int(playerChunk.x - radius, 0, playerChunk.z - radius) * WorldService.CHUNK_SIZE;
 			Vector3Int end = new Vector3Int(playerChunk.x + radius + 1, 1, playerChunk.z + radius + 1) * WorldService.CHUNK_SIZE;

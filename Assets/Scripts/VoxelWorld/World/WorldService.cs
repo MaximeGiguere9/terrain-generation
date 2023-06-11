@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using UnityEngine;
 using Utils;
 using VoxelWorld.Chunks;
@@ -41,23 +40,23 @@ namespace VoxelWorld.World
 			this.terrainGenerator = TerrainGeneratorFactory.GetTerrainGenerator(TerrainGeneratorSettings.Instance.TerrainGeneratorType);
 		}
 
-		public void LoadChunks(IEnumerable<Vector2Int> chunkPositions)
+		/// <summary>
+		/// Prepare the specified chunks to be loaded.
+		/// Invoke <see cref="GetChunkLoadRoutine"/> to load the chunks in the game loop.
+		/// </summary>
+		/// <param name="chunkPositions">The position of the chunks to load</param>
+		/// <returns>The amount of chunks that are in the load queue</returns>
+		public int PrepareChunkLoad(IEnumerable<Vector2Int> chunkPositions)
 		{
 			foreach (Vector2Int pos in chunkPositions)
 			{
 				if (this.loadedChunks.Contains(pos)) continue;
 				this.chunkLoadQueue.Add(pos);
-				MonoBehaviourHelper.Start(LoadChunksRoutine());
 			}
+			return this.chunkLoadQueue.Count;
 		}
 
-		public void LoadChunk(Vector2Int chunkPos)
-		{
-			this.chunkLoadQueue.Add(chunkPos);
-			MonoBehaviourHelper.Start(LoadChunksRoutine());
-		}
-
-		private IEnumerator LoadChunksRoutine()
+		public IEnumerator GetChunkLoadRoutine()
 		{
 			if (this.isLoadingChunks) yield break;
 			this.isLoadingChunks = true;
@@ -91,22 +90,16 @@ namespace VoxelWorld.World
 			if (res.Count > 0) OnChunksUnloaded?.Invoke(res);
 		}
 
-		public void UnloadChunk(Vector2Int chunkPos)
-		{
-			this.chunkLoadQueue.Remove(chunkPos);
-
-			if (this.loadedChunks.Remove(chunkPos))
-				OnChunksUnloaded?.Invoke(new[] {chunkPos});
-		}
-
 		private void LoadOrCreateChunk(Vector2Int chunkPos)
 		{
+			// if the chunk already exists, render it
 			if (this.chunks.ContainsKey(chunkPos))
 			{
 				this.loadedChunks.Add(chunkPos);
 				return;
 			}
 
+			// if the chunk does not exist, have it be generated
 			Chunk newChunk = new Chunk(CHUNK_SIZE, CHUNK_SUBDIVISIONS);
 			newChunk.SetChunkSpacePosition(chunkPos);
 			this.chunks.Add(chunkPos, newChunk);
@@ -131,38 +124,15 @@ namespace VoxelWorld.World
 				subChunk.GetRenderer().InvalidateMesh();
 			}
 
-			/*CoordinateIterator itr = new CoordinateIterator(new Vector3Int(16, 48, 16), Vector3Int.zero);
-			foreach (Vector3Int c in itr) newChunk.SetBlockAtLocalPosition(in c, 1);*/
-
 			this.loadedChunks.Add(chunkPos);
-
-			//if chunk exists render it, else have the terrain generator create it first
-
-			//terrain generator generates by column
-			//chunks are stored in 2d space, have sub chunks for rendering?
-
-			//terrain generator must output in the same format as chunks for easier copying
-			//terrain generator has noise object
-
-			//structures are generated separately in a second layer
-			//this is why noise should be separate (caching values)
-
-			//
 		}
 
-		public bool ChunkExists(in Vector2Int position)
-		{
-			return this.chunks.ContainsKey(position);
-		}
-
-		[CanBeNull]
 		public Chunk GetChunkFromChunkPosition(in Vector2Int position)
 		{
 			this.chunks.TryGetValue(position, out Chunk chunk);
 			return chunk;
 		}
 
-		[CanBeNull]
 		public Chunk GetChunkFromWorldPosition(in Vector3Int worldPos)
 		{
 			Vector2Int chunkPos = new Vector2Int(
