@@ -1,6 +1,5 @@
 using UnityEngine;
 using Utils;
-using VoxelWorld.Renderers;
 
 namespace VoxelWorld.Chunks
 {
@@ -11,14 +10,14 @@ namespace VoxelWorld.Chunks
 		private readonly Vector3Int offset;
 		private readonly Vector3Int size;
 
-		private readonly ChunkRenderer chunkRenderer;
+		private readonly ChunkMeshBuilder chunkRenderer;
 
 		public SubChunk(in Chunk chunk, byte subdivisionIndex)
 		{
 			this.chunk = chunk;
 			this.subdivisionIndex = subdivisionIndex;
 
-			this.chunkRenderer = new ChunkRenderer(chunk, subdivisionIndex);
+			this.chunkRenderer = new ChunkMeshBuilder(chunk, subdivisionIndex);
 
 			this.offset = chunk.GetSize().y / chunk.GetSubdivisionCount() *
 			              this.subdivisionIndex * Vector3Int.up;
@@ -29,7 +28,7 @@ namespace VoxelWorld.Chunks
 
 		public Chunk GetChunk() => this.chunk;
 
-		public ChunkRenderer GetRenderer() => this.chunkRenderer;
+		public ChunkMeshBuilder GetRenderer() => this.chunkRenderer;
 
 		public byte GetSubdivisionIndex() => this.subdivisionIndex;
 
